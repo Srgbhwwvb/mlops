@@ -1,0 +1,9 @@
+{
+  "architectures": [
+    "ResNet50"
+  ],
+  "model_type": "resnet",
+  "num_classes": 12,
+  "torch_dtype": "float32",
+  "transformers_version": "4.45.2"
+}

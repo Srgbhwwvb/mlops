@@ -1,0 +1,36 @@
+2025-11-01 16:22:45,879 - root - INFO - Using device: cpu
+2025-11-01 16:22:45,902 - root - INFO - Loaded 3800 training images
+2025-11-01 16:22:45,902 - root - INFO - Loaded 950 validation images
+2025-11-01 16:22:46,249 - root - INFO - Initialized resnet50 model with 12 classes
+2025-11-01 16:24:14,991 - root - INFO - Using device: cpu
+2025-11-01 16:24:15,011 - root - INFO - Loaded 3800 training images
+2025-11-01 16:24:15,012 - root - INFO - Loaded 950 validation images
+2025-11-01 16:24:15,346 - root - INFO - Initialized resnet50 model with 12 classes
+2025-11-01 16:24:28,459 - root - INFO - Using device: cpu
+2025-11-01 16:24:28,479 - root - INFO - Loaded 3800 training images
+2025-11-01 16:24:28,479 - root - INFO - Loaded 950 validation images
+2025-11-01 16:24:28,813 - root - INFO - Initialized resnet50 model with 12 classes
+2025-11-01 16:25:00,149 - root - INFO - Using device: cpu
+2025-11-01 16:25:00,169 - root - INFO - Loaded 3800 training images
+2025-11-01 16:25:00,169 - root - INFO - Loaded 950 validation images
+2025-11-01 16:25:00,509 - root - INFO - Initialized resnet50 model with 12 classes
+2025-11-01 16:35:55,326 - root - INFO - Using device: cpu
+2025-11-01 16:35:55,347 - root - INFO - Loaded 3800 training images
+2025-11-01 16:35:55,348 - root - INFO - Loaded 950 validation images
+2025-11-01 16:35:55,702 - root - INFO - Initialized resnet50 model with 12 classes
+2025-11-01 16:45:14,518 - root - INFO - Using device: cpu
+2025-11-01 16:45:14,537 - root - INFO - Loaded 3800 training images
+2025-11-01 16:45:14,538 - root - INFO - Loaded 950 validation images
+2025-11-01 16:45:14,870 - root - INFO - Initialized resnet50 model with 12 classes
+2025-11-01 16:45:14,871 - root - INFO - Starting training...
+2025-11-01 16:45:14,872 - root - INFO - 
+==================================================
+2025-11-01 16:45:14,872 - root - INFO - Epoch 1/10
+2025-11-01 16:45:14,872 - root - INFO - ==================================================
+2025-11-01 16:56:14,247 - root - INFO - Train Epoch 1 - Accuracy: 0.7947, Macro-F1: 0.7731, Loss: 0.6480
+2025-11-01 16:57:29,569 - root - INFO - Validation - Accuracy: 0.9074, Macro-F1: 0.8796, Loss: 0.2452
+2025-11-01 16:57:29,666 - root - INFO - Saved best model with Macro-F1: 0.8796
+2025-11-01 16:57:29,666 - root - INFO - 
+==================================================
+2025-11-01 16:57:29,666 - root - INFO - Epoch 2/10
+2025-11-01 16:57:29,666 - root - INFO - ==================================================

@@ -10,20 +10,15 @@ model:
   name: "resnet50"
   num_classes: 12
   pretrained: true
-  checkpoint_path: null
 
 # Training configuration
 training:
   batch_size: 16
-  epochs: 10
-  learning_rate: 1e-4
+  epochs: 3
+  learning_rate: 0.0001
   weight_decay: 0.001
   patience: 5
-  
-  # Optimizer
   optimizer: "adam"
-  
-  # Scheduler
   scheduler: "reduce_on_plateau"
   scheduler_config:
     mode: "min"
@@ -35,14 +30,11 @@ transforms:
   image_size: 224
   mean: [0.485, 0.456, 0.406]
   std: [0.229, 0.224, 0.225]
-  
   train:
     RandomHorizontalFlip: 0.5
     RandomVerticalFlip: 0.3
     RandomRotation: 30
-  
-  val:
-    # No augmentation for validation
+  val: {}
 
 # Logging and saving
 output:
