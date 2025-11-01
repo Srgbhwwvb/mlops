@@ -3,11 +3,10 @@ import glob
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader, random_split
 import torchvision.transforms as transforms
-from typing import Optional, Callable, List, Tuple
+from typing import Optional, Callable, List, Tuple, Dict, Any
 import torch
-
-from typing import *
-
+import logging
+from collections import Counter
 
 class PlantDataset(Dataset):
     """Dataset for plant seedlings classification."""
@@ -45,37 +44,84 @@ class PlantDataset(Dataset):
         else:
             image_name = os.path.basename(img_path)
             return image_name, image
+     
+    def get_sample_item(self, idx: int = 0) -> Tuple:
+        """Get sample item for testing without file I/O."""
+        if idx >= len(self):
+            raise IndexError("Index out of range")
+        
+        # Return mock data for testing - create a proper tensor
+        if self.is_train:
+            # Create a proper image tensor with correct shape and type
+            mock_image = torch.rand(3, 224, 224, dtype=torch.float32)
+            mock_label = 0
+            return mock_image, mock_label
+        else:
+            # For test mode
+            mock_image = torch.rand(3, 224, 224, dtype=torch.float32)
+            mock_name = "test_image.png"
+            return mock_name, mock_image
+        
+    def print_basic_stats(self):
+        """Print basic dataset statistics."""
+        if not self.img_paths:
+            logging.warning("No images found for statistics")
+            return
+            
+        # Сбор статистики по классам
+        class_counts = Counter()
+        total_images = len(self.img_paths)
+        
+        for img_path in self.img_paths:
+            if self.is_train:
+                class_name = img_path.split(os.sep)[-2]
+                class_counts[class_name] += 1
+        
+        # Логируем статистику
+        logging.info("DATASET STATISTICS:")
+        logging.info(f"  Total images: {total_images}")
+        logging.info(f"  Number of classes: {len(class_counts)}")
+        
+        if self.is_train:
+            logging.info("  Class distribution:")
+            for class_name, count in class_counts.most_common():
+                percentage = (count / total_images) * 100
+                logging.info(f"    {class_name}: {count} images ({percentage:.1f}%)")
+            
+            # Проверяем дисбаланс
+            if class_counts:
+                max_count = max(class_counts.values())
+                min_count = min(class_counts.values())
+                imbalance_ratio = max_count / min_count if min_count > 0 else float('inf')
+                logging.info(f"  Class imbalance ratio: {imbalance_ratio:.2f}")
+
+
+    @classmethod
+    def get_class_names(cls) -> List[str]:
+        """Get list of class names for testing."""
+        return cls.LABELS
+
+    def get_sample_item(self, idx: int = 0) -> Tuple:
+        """Get sample item for testing without file I/O."""
+        if idx >= len(self):
+            raise IndexError("Index out of range")
+        
+        # Return mock data for testing
+        if self.is_train:
+            return (torch.rand(3, 224, 224), 0)  # Mock image and label
+        else:
+            return ("test_image.png", torch.rand(3, 224, 224))
+    
+    
 
 
 def create_data_loaders(config: Dict[str, Any]) -> Tuple[DataLoader, DataLoader, List[str]]:
     """Create train and validation data loaders."""
+    from .preprocessing import create_train_transforms, create_val_transforms
     
-    # Define transforms
-    train_transform = transforms.Compose([
-        transforms.Resize((config['transforms']['image_size'], 
-                          config['transforms']['image_size'])),
-        transforms.RandomHorizontalFlip(
-            config['transforms']['train']['RandomHorizontalFlip']
-        ),
-        transforms.RandomRotation(
-            config['transforms']['train']['RandomRotation']
-        ),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=config['transforms']['mean'],
-            std=config['transforms']['std']
-        )
-    ])
-    
-    val_transform = transforms.Compose([
-        transforms.Resize((config['transforms']['image_size'], 
-                          config['transforms']['image_size'])),
-        transforms.ToTensor(),
-        transforms.Normalize(
-            mean=config['transforms']['mean'],
-            std=config['transforms']['std']
-        )
-    ])
+    # Define transforms using the new preprocessing module
+    train_transform = create_train_transforms(config)
+    val_transform = create_val_transforms(config)
 
     # Load dataset
     full_dataset = PlantDataset(
@@ -83,6 +129,9 @@ def create_data_loaders(config: Dict[str, Any]) -> Tuple[DataLoader, DataLoader,
         transform=train_transform,
         is_train=True
     )
+    
+
+    full_dataset.print_basic_stats()
 
     # Split dataset
     train_size = int((1 - config['data']['val_size']) * len(full_dataset))

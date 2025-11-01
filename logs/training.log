@@ -34,3 +34,35 @@
 ==================================================
 2025-11-01 16:57:29,666 - root - INFO - Epoch 2/10
 2025-11-01 16:57:29,666 - root - INFO - ==================================================
+2025-11-01 17:09:08,874 - root - INFO - Train Epoch 2 - Accuracy: 0.9358, Macro-F1: 0.9271, Loss: 0.2104
+2025-11-01 17:10:31,728 - root - INFO - Validation - Accuracy: 0.9137, Macro-F1: 0.8816, Loss: 0.2398
+2025-11-01 17:10:31,876 - root - INFO - Saved best model with Macro-F1: 0.8816
+2025-11-01 17:10:31,876 - root - INFO - 
+==================================================
+2025-11-01 17:10:31,877 - root - INFO - Epoch 3/10
+2025-11-01 17:10:31,877 - root - INFO - ==================================================
+2025-11-01 17:22:12,509 - root - INFO - Train Epoch 3 - Accuracy: 0.9534, Macro-F1: 0.9476, Loss: 0.1343
+2025-11-01 17:23:30,256 - root - INFO - Validation - Accuracy: 0.9484, Macro-F1: 0.9390, Loss: 0.2127
+2025-11-01 17:23:30,392 - root - INFO - Saved best model with Macro-F1: 0.9390
+2025-11-01 17:23:30,394 - root - INFO - 
+==================================================
+2025-11-01 17:23:30,394 - root - INFO - Epoch 4/10
+2025-11-01 17:23:30,394 - root - INFO - ==================================================
+2025-11-01 17:50:21,741 - root - INFO - Using device: cpu
+2025-11-01 17:50:21,777 - root - INFO - Loaded 3800 training images
+2025-11-01 17:50:21,778 - root - INFO - Loaded 950 validation images
+2025-11-01 17:50:22,225 - root - INFO - Initialized resnet50 model with 12 classes
+2025-11-01 17:53:19,129 - root - INFO - Starting plant classification training
+2025-11-01 17:53:19,130 - root - INFO - Using device: cpu
+2025-11-01 17:53:19,151 - root - INFO - Loaded 3800 training images
+2025-11-01 17:53:19,151 - root - INFO - Loaded 950 validation images
+2025-11-01 17:53:19,151 - root - INFO - Classes: ['Black-grass', 'Charlock', 'Cleavers', 'Common Chickweed', 'Common wheat', 'Fat Hen', 'Loose Silky-bent', 'Maize', 'Scentless Mayweed', 'Shepherds Purse', 'Small-flowered Cranesbill', 'Sugar beet']
+2025-11-01 17:53:19,498 - root - INFO - Initialized resnet50 model with 12 classes
+2025-11-01 17:53:19,498 - root - INFO - Config validation and conversion completed successfully
+2025-11-01 17:53:19,501 - root - INFO - Starting training...
+2025-11-01 17:53:19,501 - root - INFO - Training for 3 epochs
+2025-11-01 17:53:19,501 - root - INFO - Early stopping patience: 5
+2025-11-01 17:53:19,501 - root - INFO - 
+==================================================
+2025-11-01 17:53:19,501 - root - INFO - Epoch 1/3
+2025-11-01 17:53:19,502 - root - INFO - ==================================================
