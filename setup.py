@@ -7,7 +7,7 @@ setup(
     package_dir={"": "src"},
     install_requires=[
         "torch>=1.9.0",
-        "torchvision>=0.10.0", 
+        "torchvision>=0.10.0",
         "scikit-learn>=0.24.0",
         "pandas>=1.3.0",
         "Pillow>=8.3.0",
