@@ -4,16 +4,18 @@ from transformers import PreTrainedModel, PretrainedConfig
 import torch
 from typing import Dict, Any
 
+
 class ResNetConfig(PretrainedConfig):
     model_type = "resnet"
-    
+
     def __init__(self, num_classes=12, **kwargs):
         super().__init__(**kwargs)
         self.num_classes = num_classes
 
+
 class ResNet50(PreTrainedModel):
     config_class = ResNetConfig
-    
+
     def __init__(self, config):
         super().__init__(config)
         self.model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
@@ -25,7 +27,7 @@ class ResNet50(PreTrainedModel):
     @classmethod
     def from_config(cls, config: Dict[str, Any]):
         """Create model from configuration dictionary."""
-        model_config = ResNetConfig(num_classes=config['model']['num_classes'])
+        model_config = ResNetConfig(num_classes=config["model"]["num_classes"])
         return cls(model_config)
 
     def get_expected_input_shape(self) -> tuple:
