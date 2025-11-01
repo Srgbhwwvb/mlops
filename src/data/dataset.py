@@ -150,9 +150,9 @@ def create_data_loaders(
     val_dataset = dataset_parts[1]
 
     # Apply val transform to validation set
-    import unittest
+    from unittest import mock
 
-    if isinstance(val_dataset.dataset, unittest.mock.MagicMock) or isinstance(
+    if isinstance(val_dataset.dataset, mock.MagicMock) or isinstance(
         val_dataset.dataset, PlantDataset
     ):
         val_dataset.dataset.transform = val_transform
