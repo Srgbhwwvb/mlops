@@ -91,7 +91,7 @@ class PlantTrainer:
             mode=scheduler_config["mode"],
             factor=scheduler_config["factor"],
             patience=scheduler_config["patience"],
-            verbose=True,
+            # verbose=True,
         )
 
     def train_epoch(self, epoch: int) -> Dict[str, float]:
