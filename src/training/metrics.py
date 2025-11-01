@@ -20,4 +20,4 @@ def softmax_to_predictions(probabilities: np.ndarray) -> np.ndarray:
 
 def validate_predictions(predictions: np.ndarray, num_classes: int) -> bool:
     """Validate that predictions are within expected range."""
-    return (predictions >= 0).all() and (predictions < num_classes).all()
+    return bool((predictions >= 0).all()) and bool((predictions < num_classes).all())

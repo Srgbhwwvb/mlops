@@ -97,7 +97,7 @@ class PlantTrainer:
     def train_epoch(self, epoch: int) -> Dict[str, float]:
         """Train for one epoch and return metrics."""
         self.model.train()
-        total_loss = 0
+        total_loss: float = 0.0
         all_predictions = []
         all_targets = []
 
@@ -139,7 +139,7 @@ class PlantTrainer:
     def validate(self) -> Dict[str, float]:
         """Validate model and return metrics."""
         self.model.eval()
-        val_loss = 0
+        val_loss: float = 0.0
         all_predictions = []
         all_targets = []
 
@@ -286,7 +286,7 @@ class PlantTrainer:
         # Calculate metrics
         pred = output.argmax(dim=1)
         predictions = pred.cpu().numpy()
-        targets = mock_target.cpu().numpy()
+        targets = mock_target.cpu().numpy().tolist()
 
         metrics = calculate_classification_metrics(predictions, targets)
         metrics["loss"] = loss.item()

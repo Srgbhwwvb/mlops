@@ -14,3 +14,4 @@ flake8>=3.9.0
 pylint>=2.8.0
 mypy>=0.910
 codecov>=2.0.0
+types-PyYAML>-6.0.12

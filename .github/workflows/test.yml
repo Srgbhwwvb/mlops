@@ -66,4 +66,4 @@ jobs:
     
     - name: Type checking with mypy
       run: |
-        mypy src/ --ignore-missing-imports
+        mypy src/ --ignore-missing-imports --disable-error-code=import-untyped

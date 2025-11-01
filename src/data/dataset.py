@@ -55,22 +55,22 @@ class PlantDataset(Dataset):
             image_name = os.path.basename(img_path)
             return image_name, image
 
-    def get_sample_item(self, idx: int = 0) -> Tuple:
-        """Get sample item for testing without file I/O."""
-        if idx >= len(self):
-            raise IndexError("Index out of range")
+    # def get_sample_item(self, idx: int = 0) -> Tuple:
+    #     """Get sample item for testing without file I/O."""
+    #     if idx >= len(self):
+    #         raise IndexError("Index out of range")
 
-        # Return mock data for testing - create a proper tensor
-        if self.is_train:
-            # Create a proper image tensor with correct shape and type
-            mock_image = torch.rand(3, 224, 224, dtype=torch.float32)
-            mock_label = 0
-            return mock_image, mock_label
-        else:
-            # For test mode
-            mock_image = torch.rand(3, 224, 224, dtype=torch.float32)
-            mock_name = "test_image.png"
-            return mock_name, mock_image
+    #     # Return mock data for testing - create a proper tensor
+    #     if self.is_train:
+    #         # Create a proper image tensor with correct shape and type
+    #         mock_image = torch.rand(3, 224, 224, dtype=torch.float32)
+    #         mock_label = 0
+    #         return mock_image, mock_label
+    #     else:
+    #         # For test mode
+    #         mock_image = torch.rand(3, 224, 224, dtype=torch.float32)
+    #         mock_name = "test_image.png"
+    #         return mock_name, mock_image
 
     def print_basic_stats(self):
         """Print basic dataset statistics."""
