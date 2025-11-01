@@ -145,10 +145,15 @@ def create_data_loaders(
     train_size = int((1 - config["data"]["val_size"]) * len(full_dataset))
     val_size = len(full_dataset) - train_size
 
-    train_dataset, val_dataset = random_split(full_dataset, [train_size, val_size])
+    dataset_parts = random_split(full_dataset, [train_size, val_size])
+    train_dataset = dataset_parts[0]
+    val_dataset = dataset_parts[1]
 
     # Apply val transform to validation set
-    val_dataset.dataset.transform = val_transform
+    if isinstance(val_dataset.dataset, PlantDataset):
+        val_dataset.dataset.transform = val_transform
+    else:
+        logging.warning("must be PlantDataset")
 
     # Create data loaders
     train_loader = DataLoader(
