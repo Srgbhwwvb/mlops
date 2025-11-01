@@ -44,5 +44,6 @@ def check_all_files():
         else:
             print(f"❌ {file_path} НЕ СУЩЕСТВУЕТ")
 
+
 if __name__ == "__main__":
-    check_all_files()
+    check_all_files()  
