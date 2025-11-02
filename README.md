@@ -44,42 +44,53 @@
 ## Запуск кода
 
 * Клонировать репрезиторий:
-git clone https://github.com/Srgbhwwvb/mlops.git
-cd mlops
+  
+`git clone https://github.com/Srgbhwwvb/mlops.git`
+
+`cd mlops`
 
 * Установка зависимостей:
-  pip install -r requirements.txt
+  
+  `pip install -r requirements.txt`
 
 * Для перехода в режим разработчика:
-  pip install -e
+  
+  `pip install -e`
 
 * Подготовка данных:
-  Скачайте датасет с Kaggle: https://www.kaggle.com/c/plant-seedlings-classification/data
+  Скачайте датасет с Kaggle: [https://www.kaggle.com/c/plant-seedlings-classification/data]
   Распакуйте данные в удобное место, например:
-  C:/Users/YourName/Downloads/plant-seedlings-classification/
+  `C:/Users/YourName/Downloads/plant-seedlings-classification/`
 
   Обновите пути в файле configs/train_config.yaml:
   data:
-    train_path: "ВАШ_ПУТЬ/plant-seedlings-classification/train/*/*.png"
-    test_path: "ВАШ_ПУТЬ/plant-seedlings-classification/test/*.png"
+  
+    `train_path: "ВАШ_ПУТЬ/plant-seedlings-classification/train/*/*.png"`
+  
+    `test_path: "ВАШ_ПУТЬ/plant-seedlings-classification/test/*.png"`
   
 * Для запуска обучения:
-  python scripts/train.py --config configs/train_config.yaml
+  
+  `python scripts/train.py --config configs/train_config.yaml`
   
 * Для запуска обучения с логированием:
-  python scripts/train.py --config configs/train_config.yaml --verbose
+  
+  `python scripts/train.py --config configs/train_config.yaml --verbose`
 
 * Для загрузки весов лучшей обученной модели и запуска валидации:
-  python scripts/validate.py --config configs/train_config.yaml --model_path models/best_model
+  
+  `python scripts/validate.py --config configs/train_config.yaml --model_path models/best_model`
 
 * Для запуска тестов:
-  pytest tests/ -v
+
+  `pytest tests/ -v`
   
 * Для вывода покрытия:
-  python check_coverage.py
+  
+  `python check_coverage.py`
 
 ## Результаты на тестовой выборке:
-Accuracy: 0.9663
-Macro F1-Score: 0.9634
+* Accuracy: 0.9663
+* Macro F1-Score: 0.9634
 
 
