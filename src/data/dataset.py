@@ -78,7 +78,7 @@ class PlantDataset(Dataset):
             logging.warning("No images found for statistics")
             return
 
-        # Сбор статистики по классам
+        # Picking up statistics of classes
         class_counts = Counter()
         total_images = len(self.img_paths)
 
@@ -87,7 +87,7 @@ class PlantDataset(Dataset):
                 class_name = img_path.split(os.sep)[-2]
                 class_counts[class_name] += 1
 
-        # Логируем статистику
+        # Statistics logging
         logging.info("DATASET STATISTICS:")
         logging.info(f"  Total images: {total_images}")
         logging.info(f"  Number of classes: {len(class_counts)}")
@@ -98,7 +98,7 @@ class PlantDataset(Dataset):
                 percentage = (count / total_images) * 100
                 logging.info(f"    {class_name}: {count} images ({percentage:.1f}%)")
 
-            # Проверяем дисбаланс
+            # Check disbalance
             if class_counts:
                 max_count = max(class_counts.values())
                 min_count = min(class_counts.values())
