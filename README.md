@@ -68,3 +68,15 @@
 
 8.  **Подготовка к продакшену (MLOps)**
     *   It would be later.
+
+## Запуск кода
+
+* Клонировать репрезиторий:
+git clone https://github.com/Srgbhwwvb/mlops.git
+cd mlops
+
+* Установка зависимостей:
+  pip install -r requirements.txt
+
+* Для запуска обучения:
+  python scripts/train.py --config configs/train_config.yaml --verbose
