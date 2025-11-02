@@ -17,6 +17,7 @@ from src.data.dataset import create_data_loaders
 from src.models.resnet import ResNet50
 from src.training.metrics import calculate_classification_metrics
 
+
 def validate_model(config_path, model_path, detailed=False):
     """Validate a trained model using existing components"""
     print(f"Starting validation with config: {config_path}")
@@ -24,10 +25,10 @@ def validate_model(config_path, model_path, detailed=False):
 
     # Load configuration
     config = load_config(config_path)
-    
+
     # Setup logging
     log_level = "DEBUG" if detailed else "INFO"
-    logging.basicConfig(level=log_level, format='%(message)s')
+    logging.basicConfig(level=log_level, format="%(message)s")
 
     # Device setup
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -67,10 +68,10 @@ def validate_model(config_path, model_path, detailed=False):
 
     # Calculate metrics using existing function
     metrics = calculate_classification_metrics(all_predictions, all_targets)
-    
-    print("\n" + "="*50)
+
+    print("\n" + "=" * 50)
     print("VALIDATION RESULTS")
-    print("="*50)
+    print("=" * 50)
     print(f"Accuracy: {metrics['accuracy']:.4f}")
     print(f"Macro F1-Score: {metrics['macro_f1']:.4f}")
     print(f"Total samples: {len(all_targets)}")
@@ -78,9 +79,12 @@ def validate_model(config_path, model_path, detailed=False):
     if detailed:
         # Detailed classification report
         print("\nDetailed Classification Report:")
-        print(classification_report(all_targets, all_predictions, 
-                                  target_names=class_names, digits=4))
-        
+        print(
+            classification_report(
+                all_targets, all_predictions, target_names=class_names, digits=4
+            )
+        )
+
         # Confusion matrix
         cm = confusion_matrix(all_targets, all_predictions)
         cm_df = pd.DataFrame(cm, index=class_names, columns=class_names)
@@ -89,15 +93,19 @@ def validate_model(config_path, model_path, detailed=False):
 
     return metrics
 
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Validate plant classification model')
-    parser.add_argument('--config', type=str, required=True, 
-                       help='Path to configuration file')
-    parser.add_argument('--model_path', type=str, required=True,
-                       help='Path to trained model directory')
-    parser.add_argument('--detailed', action='store_true', 
-                       help='Show detailed metrics per class')
-    
+    parser = argparse.ArgumentParser(description="Validate plant classification model")
+    parser.add_argument(
+        "--config", type=str, required=True, help="Path to configuration file"
+    )
+    parser.add_argument(
+        "--model_path", type=str, required=True, help="Path to trained model directory"
+    )
+    parser.add_argument(
+        "--detailed", action="store_true", help="Show detailed metrics per class"
+    )
+
     args = parser.parse_args()
-    
+
     validate_model(args.config, args.model_path, args.detailed)
