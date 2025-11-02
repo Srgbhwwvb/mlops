@@ -31,25 +31,25 @@ def setup_logging(log_dir: str, level: str = "INFO"):
 
 def main(config_path: str, verbose: bool = False):
     """Main training function."""
-    print(f"🚀 Starting training with config: {config_path}")
+    print(f" Starting training with config: {config_path}")
 
     # Проверка существования конфига
     if not os.path.exists(config_path):
-        print(f"❌ Config file not found: {config_path}")
+        print(f"Config file not found: {config_path}")
         return
 
     # Загрузка конфигурации
     try:
         config = load_config(config_path)
-        print("✅ Config loaded successfully")
+        print("Config loaded successfully")
 
         # Логируем ключевые параметры для отладки
         print(
-            f"📋 Learning rate from config: {config['training']['learning_rate']} (type: {type(config['training']['learning_rate'])})"
+            f"Learning rate from config: {config['training']['learning_rate']} (type: {type(config['training']['learning_rate'])})"
         )
 
     except Exception as e:
-        print(f"❌ Error loading config: {e}")
+        print(f"Error loading config: {e}")
         return
 
     # Настройка логирования
@@ -58,7 +58,6 @@ def main(config_path: str, verbose: bool = False):
 
     logging.info("Starting plant classification training")
 
-    # Устройство
     import torch
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -88,20 +87,19 @@ def main(config_path: str, verbose: bool = False):
 
     # Создание тренера и запуск обучения
     try:
-        # ПЕРЕДАЕМ class_names КАК ПОСЛЕДНИЙ АРГУМЕНТ
         trainer = PlantTrainer(
             model, train_loader, val_loader, device, config, class_names
         )
         trainer.train()
-        logging.info("🎉 Training completed successfully!")
+        logging.info("Training completed successfully!")
 
         # Вывод итогов
         summary = trainer.get_training_summary()
         if summary:
-            logging.info(f"📈 Training summary: {summary}")
+            logging.info(f" Training summary: {summary}")
 
     except Exception as e:
-        logging.error(f"❌ Error during training: {e}")
+        logging.error(f" Error during training: {e}")
         import traceback
 
         logging.error(traceback.format_exc())

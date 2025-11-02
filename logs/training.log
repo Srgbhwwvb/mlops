@@ -97,3 +97,34 @@
 ==================================================
 2025-11-01 20:36:57,821 - root - INFO - Epoch 1/3
 2025-11-01 20:36:57,821 - root - INFO - ==================================================
+2025-11-02 16:44:38,527 - root - INFO - Starting plant classification training
+2025-11-02 16:44:38,529 - root - INFO - Using device: cpu
+2025-11-02 16:44:38,552 - root - INFO - DATASET STATISTICS:
+2025-11-02 16:44:38,553 - root - INFO -   Total images: 4750
+2025-11-02 16:44:38,553 - root - INFO -   Number of classes: 12
+2025-11-02 16:44:38,553 - root - INFO -   Class distribution:
+2025-11-02 16:44:38,554 - root - INFO -     Loose Silky-bent: 654 images (13.8%)
+2025-11-02 16:44:38,554 - root - INFO -     Common Chickweed: 611 images (12.9%)
+2025-11-02 16:44:38,554 - root - INFO -     Scentless Mayweed: 516 images (10.9%)
+2025-11-02 16:44:38,554 - root - INFO -     Small-flowered Cranesbill: 496 images (10.4%)
+2025-11-02 16:44:38,555 - root - INFO -     Fat Hen: 475 images (10.0%)
+2025-11-02 16:44:38,555 - root - INFO -     Charlock: 390 images (8.2%)
+2025-11-02 16:44:38,556 - root - INFO -     Sugar beet: 385 images (8.1%)
+2025-11-02 16:44:38,556 - root - INFO -     Cleavers: 287 images (6.0%)
+2025-11-02 16:44:38,556 - root - INFO -     Black-grass: 263 images (5.5%)
+2025-11-02 16:44:38,556 - root - INFO -     Shepherds Purse: 231 images (4.9%)
+2025-11-02 16:44:38,557 - root - INFO -     Common wheat: 221 images (4.7%)
+2025-11-02 16:44:38,557 - root - INFO -     Maize: 221 images (4.7%)
+2025-11-02 16:44:38,557 - root - INFO -   Class imbalance ratio: 2.96
+2025-11-02 16:44:38,566 - root - INFO - Loaded 3800 training images
+2025-11-02 16:44:38,566 - root - INFO - Loaded 950 validation images
+2025-11-02 16:44:38,567 - root - INFO - Classes: ['Black-grass', 'Charlock', 'Cleavers', 'Common Chickweed', 'Common wheat', 'Fat Hen', 'Loose Silky-bent', 'Maize', 'Scentless Mayweed', 'Shepherds Purse', 'Small-flowered Cranesbill', 'Sugar beet']
+2025-11-02 16:44:39,048 - root - INFO - Initialized resnet50 model with 12 classes
+2025-11-02 16:44:39,048 - root - INFO - Config validation and conversion completed successfully
+2025-11-02 16:44:39,049 - root - INFO - Starting training...
+2025-11-02 16:44:39,049 - root - INFO - Training for 3 epochs
+2025-11-02 16:44:39,050 - root - INFO - Early stopping patience: 5
+2025-11-02 16:44:39,050 - root - INFO - 
+==================================================
+2025-11-02 16:44:39,050 - root - INFO - Epoch 1/3
+2025-11-02 16:44:39,050 - root - INFO - ==================================================
