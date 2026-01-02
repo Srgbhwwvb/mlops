@@ -205,26 +205,26 @@ class PlantTrainer:
                 os.makedirs(save_path, exist_ok=True)
                 self.model.save_pretrained(save_path)
                 logging.info(
-                    f"✅ Saved best model with Macro-F1: {val_metrics['macro_f1']:.4f}"
+                    f"Saved best model with Macro-F1: {val_metrics['macro_f1']:.4f}"
                 )
             else:
                 self.patience_counter += 1
                 logging.info(
-                    f"⏳ No improvement. Patience counter: {self.patience_counter}/{patience}"
+                    f" No improvement. Patience counter: {self.patience_counter}/{patience}"
                 )
                 if self.patience_counter >= patience:
-                    logging.info(f"🛑 Early stopping at epoch {epoch}")
+                    logging.info(f" Early stopping at epoch {epoch}")
                     break
 
         # Save final model
         final_path = os.path.join(self.config["output"]["model_dir"], "final_model")
         os.makedirs(final_path, exist_ok=True)
         self.model.save_pretrained(final_path)
-        logging.info("✅ Saved final model")
+        logging.info("Saved final model")
 
         # Save metrics
         self._save_metrics()
-        logging.info("🎉 Training completed!")
+        logging.info("Training completed!")
 
         return self.get_training_summary()
 
@@ -251,7 +251,7 @@ class PlantTrainer:
             self.config["output"]["model_dir"], "training_metrics.csv"
         )
         metrics_df.to_csv(metrics_path, index=False)
-        logging.info(f"📊 Metrics saved to {metrics_path}")
+        logging.info(f"Metrics saved to {metrics_path}")
 
     def get_training_summary(self) -> Dict[str, Any]:
         """Get summary of training results."""

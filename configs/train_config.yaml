@@ -1,7 +1,9 @@
 # Data configuration
 data:
-  train_path: "C:/Users/Alex/Downloads/plant-seedlings-classification/train/*/*.png"
-  test_path: "C:/Users/Alex/Downloads/plant-seedlings-classification/test/*.png"
+  # train_path: "C:/Users/Alex/Downloads/plant-seedlings-classification/train/*/*.png"
+  # test_path: "C:/Users/Alex/Downloads/plant-seedlings-classification/test/*.png"
+  train_path: "./data/initial_data/train/*/*.png"
+  test_path: "./data/initial_data/test/*.png"
   val_size: 0.2
   random_seed: 42
 

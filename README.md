@@ -41,39 +41,43 @@
     
 9.  Подготовка к продакшену
 
-## Запуск кода
+## Установка
 
-* Клонировать репрезиторий:
-  
-`git clone https://github.com/Srgbhwwvb/mlops.git`
+Клонировать репозиторий, создать виртуальное окрежение и установить пакеты:
+```
+git clone https://github.com/Srgbhwwvb/mlops.git
+cd mlops
+python -m venv .venv
+source .venv/bin/activate
+pip install -e ".[dev, test]"
+```
+Проект использует `pyproject.toml` для своего управления.
 
-`cd mlops`
+## Структура проекта
 
-* Установка зависимостей:
-  
-  `pip install -r requirements.txt`
+1. папка `./config` содержит `train_config.yaml`, задающий параметры модели, предобработки датасета и процесса обучения. См. текущее содержание для примера;
+2. папка `./src` содержит исходный код;
+3. папка `./tests` -- тесты.
 
-* Для перехода в режим разработчика:
-  
-  `pip install -e`
+Для запуска различных задач используется Taskipy:
+1. тесты: `task test`;
+2. линтер: `task lint`;
+3. форматтер: `task fmt`.
 
-* Подготовка данных:
-  Скачайте датасет с Kaggle: [https://www.kaggle.com/c/plant-seedlings-classification/data]
-  Распакуйте данные в удобное место, например:
-  `C:/Users/YourName/Downloads/plant-seedlings-classification/`
-
-  Обновите пути в файле configs/train_config.yaml:
+## Подготовка данных:
+1. скачать датасет с Kaggle: [https://www.kaggle.com/c/plant-seedlings-classification/data], распаковать;
+2. в файле `configs/train_config.yaml`:
   data:
   
     `train_path: "ВАШ_ПУТЬ/plant-seedlings-classification/train/*/*.png"`
   
     `test_path: "ВАШ_ПУТЬ/plant-seedlings-classification/test/*.png"`
   
-* Для запуска обучения:
+Запуск обучения:
   
   `python scripts/train.py --config configs/train_config.yaml`
   
-* Для запуска обучения с логированием:
+Запуск обучения с логированием:
   
   `python scripts/train.py --config configs/train_config.yaml --verbose`
 

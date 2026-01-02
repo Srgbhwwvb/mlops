@@ -7,15 +7,10 @@ import logging
 from sklearn.metrics import classification_report, confusion_matrix
 import pandas as pd
 
-# Добавляем корень проекта в Python path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir)
-sys.path.insert(0, project_root)
-
-from src.utils.config import load_config
-from src.data.dataset import create_data_loaders
-from src.models.resnet import ResNet50
-from src.training.metrics import calculate_classification_metrics
+from ..utils.config import load_config
+from ..data.dataset import create_data_loaders
+from ..models.resnet import ResNet50
+from ..training.metrics import calculate_classification_metrics
 
 
 def validate_model(config_path, model_path, detailed=False):
@@ -94,7 +89,7 @@ def validate_model(config_path, model_path, detailed=False):
     return metrics
 
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Validate plant classification model")
     parser.add_argument(
         "--config", type=str, required=True, help="Path to configuration file"
@@ -109,3 +104,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     validate_model(args.config, args.model_path, args.detailed)
+
+
+if __name__ == "__main__":
+    main()

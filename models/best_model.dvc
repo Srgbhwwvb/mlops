@@ -1,0 +1,6 @@
+outs:
+- md5: 05d63a005ff019a08c30876e0ce607ba.dir
+  size: 94374068
+  nfiles: 2
+  hash: md5
+  path: best_model

@@ -1,0 +1,55 @@
+[project]
+name = "mlops"
+version = "0.9.0"
+requires-python = ">=3.12"
+readme = "README.md"
+dependencies = [
+    "torch",
+    "torchvision",
+    "scikit-learn",
+    "pandas",
+    "matplotlib",
+    "Pillow",
+    "tqdm",
+    "PyYAML",
+    "transformers"
+]
+
+[project.optional-dependencies]
+dev = [
+    "taskipy",
+
+    "mypy",
+    "types-PyYAML",
+
+    "pylint",
+    "ruff",
+    "codecov"
+]
+test = [
+    "pytest",
+    "pytest-cov"
+]
+
+[tool.taskipy.tasks]
+lint = "ruff check src tests ; pylint src tests --exit-zero ; mypy src tests"
+fmt  = "ruff format src tests"
+test = "pytest tests/ -v"
+
+predict    = "predict"
+setup_data = "ssetup_data"
+train      = "train"
+validate   = "validate"
+
+[project.scripts]
+predict    = "scripts.predict:main"
+setup_data = "scripts.setup_data:main"
+train      = "scripts.train:main"
+validate   = "scripts.validate:main"
+
+[build-system]
+requires = [
+    "setuptools",
+    "wheel"
+]
+build-backend = "setuptools.build_meta"

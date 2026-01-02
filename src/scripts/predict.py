@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 import argparse
 import os
-import sys
 import glob
 from PIL import Image
+import torch
 import torchvision.transforms as transforms
 
-# Добавляем корень проекта в Python path
-current_dir = os.path.dirname(os.path.abspath(__file__))
-project_root = os.path.dirname(current_dir)
-sys.path.insert(0, project_root)
-
-from src.models.resnet import ResNet50
-from src.data.dataset import PlantDataset
-from src.api.predictor import PlantPredictor
-from src.utils.config import load_config
-from src.data.preprocessing import create_val_transforms
+from ..models.resnet import ResNet50
+from ..data.dataset import PlantDataset
+from ..api.predictor import PlantPredictor
+from ..utils.config import load_config
+from ..data.preprocessing import create_val_transforms
 
 
 def predict_single_image(
@@ -100,9 +95,7 @@ def predict_batch(model_path, folder_path, config_path="configs/train_config.yam
     return results
 
 
-if __name__ == "__main__":
-    import torch
-
+def main():
     parser = argparse.ArgumentParser(
         description="Predict plant class using PlantPredictor"
     )
@@ -126,3 +119,7 @@ if __name__ == "__main__":
         predict_batch(args.model_path, args.folder, args.config)
     else:
         print("Please specify either --image or --folder")
+
+
+if __name__ == "__main__":
+    main()
