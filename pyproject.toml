@@ -17,12 +17,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "taskipy",
-
-    "mypy",
-    "types-PyYAML",
-
-    "pylint",
+    "ty",
     "ruff",
     "codecov"
 ]
@@ -32,24 +27,26 @@ test = [
 ]
 
 [tool.taskipy.tasks]
-lint = "ruff check src tests ; pylint src tests --exit-zero ; mypy src tests"
+lint = "ruff check src tests ; ty check src tests"
 fmt  = "ruff format src tests"
 test = "pytest tests/ -v"
 
 predict    = "predict"
-setup_data = "ssetup_data"
+setup_data = "setup_data"
 train      = "train"
 validate   = "validate"
 
 [project.scripts]
-predict    = "scripts.predict:main"
-setup_data = "scripts.setup_data:main"
-train      = "scripts.train:main"
-validate   = "scripts.validate:main"
+predict    = "predict:main"
+setup_data = "setup_data:main"
+train      = "train:main"
+validate   = "validate:main"
 
 [build-system]
 requires = [
     "setuptools",
-    "wheel"
+    "wheel",
+    "taskipy",
+    "dvc"
 ]
 build-backend = "setuptools.build_meta"

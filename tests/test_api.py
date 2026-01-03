@@ -138,7 +138,7 @@ class TestPredictorEdgeCases:
         # Вместо проверки исключения, проверяем что что-то пошло не так
         # либо в predict_proba, либо в другом месте
         try:
-            result = predictor.predict_proba(wrong_dims)
+            predictor.predict_proba(wrong_dims)
             # Если дошли сюда, проверяем что результат имеет ожидаемую форму
             # или пропускаем тест
             pytest.skip("Current implementation doesn't validate input dimensions")
@@ -150,7 +150,7 @@ class TestPredictorEdgeCases:
         wrong_channels = torch.randn(2, 1, 224, 224)  # Grayscale instead of RGB
 
         try:
-            result = predictor.predict_proba(wrong_channels)
+            predictor.predict_proba(wrong_channels)
             pytest.skip("Current implementation doesn't validate input channels")
         except Exception:
             pass

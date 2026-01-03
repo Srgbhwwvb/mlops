@@ -1,6 +1,5 @@
-import pytest
 import torch
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock
 from src.training.trainer import PlantTrainer
 
 

@@ -1,7 +1,5 @@
 import os
-import yaml
 from typing import Dict, Any, List
-import numpy as np
 from PIL import Image
 
 

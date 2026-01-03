@@ -4,13 +4,11 @@ import os
 import glob
 from PIL import Image
 import torch
-import torchvision.transforms as transforms
 
-from ..models.resnet import ResNet50
-from ..data.dataset import PlantDataset
-from ..api.predictor import PlantPredictor
-from ..utils.config import load_config
-from ..data.preprocessing import create_val_transforms
+from models import ResNet50
+from data import PlantDataset, create_val_transforms
+from api import PlantPredictor
+from utils import load_config
 
 
 def predict_single_image(
@@ -50,7 +48,7 @@ def predict_single_image(
         result["probabilities"].items(), key=lambda x: x[1], reverse=True
     )[:3]
     for i, (class_name, prob) in enumerate(sorted_probs):
-        print(f"  {i+1}. {class_name}: {prob:.4f}")
+        print(f"  {i + 1}. {class_name}: {prob:.4f}")
 
     return result
 

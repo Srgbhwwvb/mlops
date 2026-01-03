@@ -2,7 +2,6 @@ import os
 import glob
 from PIL import Image
 from torch.utils.data import Dataset, DataLoader, random_split
-import torchvision.transforms as transforms
 from typing import Optional, Callable, List, Tuple, Dict, Any
 import torch
 import logging

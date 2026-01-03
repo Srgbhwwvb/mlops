@@ -4,23 +4,6 @@ import tempfile
 import os
 from unittest.mock import patch, MagicMock
 from PIL import Image
-import numpy as np
-
-from src.data.dataset import PlantDataset, create_data_loaders
-from src.data.preprocessing import (
-    create_train_transforms,
-    create_val_transforms,
-    create_test_transforms,
-)
-from src.utils.validation import validate_image_file, validate_dataset_structure
-
-import pytest
-import torch
-import tempfile
-import os
-from unittest.mock import patch, MagicMock
-from PIL import Image
-import numpy as np
 
 from src.data.dataset import PlantDataset, create_data_loaders
 from src.data.preprocessing import (
@@ -388,14 +371,14 @@ class TestDataValidation:
             img.save(valid_img_path)
             img.close()  # Явно закрываем изображение
 
-            assert validate_image_file(valid_img_path) == True
+            assert validate_image_file(valid_img_path)
 
             # Test invalid file
             invalid_path = os.path.join(tmpdir, "invalid.txt")
             with open(invalid_path, "w") as f:
                 f.write("not an image")
 
-            assert validate_image_file(invalid_path) == False
+            assert not validate_image_file(invalid_path)
 
     def test_validate_dataset_structure(self):
         """Test dataset structure validation."""

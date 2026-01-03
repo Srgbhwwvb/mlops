@@ -1,4 +1,3 @@
-import pytest
 import numpy as np
 
 from src.training.metrics import (
@@ -40,10 +39,10 @@ class TestMetrics:
     def test_validate_predictions(self):
         """Test predictions validation."""
         valid_predictions = np.array([0, 1, 2])
-        assert validate_predictions(valid_predictions, num_classes=3) == True
+        assert validate_predictions(valid_predictions, num_classes=3)
 
         invalid_predictions = np.array([0, 1, 5])
-        assert validate_predictions(invalid_predictions, num_classes=3) == False
+        assert not validate_predictions(invalid_predictions, num_classes=3)
 
         negative_predictions = np.array([-1, 0, 1])
-        assert validate_predictions(negative_predictions, num_classes=3) == False
+        assert not validate_predictions(negative_predictions, num_classes=3)

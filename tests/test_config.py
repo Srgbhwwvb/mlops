@@ -1,4 +1,3 @@
-import pytest
 import tempfile
 import os
 from src.utils.config import load_config, save_config

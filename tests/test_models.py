@@ -1,4 +1,3 @@
-import pytest
 import torch
 from src.models.resnet import ResNet50, ResNetConfig
 

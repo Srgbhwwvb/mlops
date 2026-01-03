@@ -1,5 +1,4 @@
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
 from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
@@ -7,7 +6,7 @@ import logging
 from tqdm import tqdm
 import pandas as pd
 import os
-from typing import Dict, List, Tuple, Optional, Any
+from typing import Dict, Any
 
 from .metrics import calculate_classification_metrics
 
@@ -130,8 +129,8 @@ class PlantTrainer:
         metrics["loss"] = total_loss / len(self.train_loader)
 
         logging.info(
-            f'Train Epoch {epoch} - Accuracy: {metrics["accuracy"]:.4f}, '
-            f'Macro-F1: {metrics["macro_f1"]:.4f}, Loss: {metrics["loss"]:.4f}'
+            f"Train Epoch {epoch} - Accuracy: {metrics['accuracy']:.4f}, "
+            f"Macro-F1: {metrics['macro_f1']:.4f}, Loss: {metrics['loss']:.4f}"
         )
 
         return metrics
@@ -157,8 +156,8 @@ class PlantTrainer:
         metrics["loss"] = val_loss / len(self.val_loader.dataset)
 
         logging.info(
-            f'Validation - Accuracy: {metrics["accuracy"]:.4f}, '
-            f'Macro-F1: {metrics["macro_f1"]:.4f}, Loss: {metrics["loss"]:.4f}'
+            f"Validation - Accuracy: {metrics['accuracy']:.4f}, "
+            f"Macro-F1: {metrics['macro_f1']:.4f}, Loss: {metrics['loss']:.4f}"
         )
 
         return metrics
@@ -174,9 +173,9 @@ class PlantTrainer:
         logging.info(f"Early stopping patience: {patience}")
 
         for epoch in range(1, epochs + 1):
-            logging.info(f"\n{'='*50}")
+            logging.info(f"\n{'=' * 50}")
             logging.info(f"Epoch {epoch}/{epochs}")
-            logging.info(f"{'='*50}")
+            logging.info(f"{'=' * 50}")
 
             # Training
             train_metrics = self.train_epoch(epoch)

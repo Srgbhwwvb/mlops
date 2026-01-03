@@ -2,12 +2,11 @@
 import argparse
 import logging
 import os
-import sys
 
-from ..utils.config import load_config
-from ..data.dataset import create_data_loaders
-from ..models.resnet import ResNet50, ResNetConfig
-from ..training.trainer import PlantTrainer
+from utils import load_config
+from data import create_data_loaders
+from models import ResNet50, ResNetConfig
+from training import PlantTrainer
 
 
 def setup_logging(log_dir: str, level: str = "INFO"):

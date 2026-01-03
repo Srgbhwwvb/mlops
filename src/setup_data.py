@@ -1,10 +1,9 @@
 #!/usr/bin/env python3
 import argparse
 import os
-import sys
 
-from ..utils.config import load_config
-from ..data.dataset import create_data_loaders
+from utils import load_config
+from data import PlantDataset, create_train_transforms
 
 import torch
 
@@ -29,20 +28,18 @@ def setup_data(config_path: str):
         print(
             f"Learning rate from config: {config['training']['learning_rate']} (type: {type(config['training']['learning_rate'])})"
         )
-        
+
     except Exception as e:
         raise ValueError(f"Error loading config: {e}")
-    
-    from src.data.preprocessing import create_train_transforms
-    from src.data.dataset import PlantDataset
+
     train_transform = create_train_transforms(config)
-    
+
     # Load dataset
     full_dataset = PlantDataset(
         config["data"]["train_path"], transform=train_transform, is_train=True
     )
 
-    torch.save(full_dataset, 'data/prepared_data')
+    torch.save(full_dataset, "data/prepared_data")
 
 
 def main():
@@ -55,6 +52,6 @@ def main():
 
     setup_data(args.config)
 
-    
+
 if __name__ == "__main__":
     main()

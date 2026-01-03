@@ -1,6 +1,3 @@
-import pytest
-import yaml
-
 from src.utils.validation import validate_config_structure
 
 

@@ -1,16 +1,15 @@
 #!/usr/bin/env python3
 import argparse
 import os
-import sys
 import torch
 import logging
 from sklearn.metrics import classification_report, confusion_matrix
 import pandas as pd
 
-from ..utils.config import load_config
-from ..data.dataset import create_data_loaders
-from ..models.resnet import ResNet50
-from ..training.metrics import calculate_classification_metrics
+from utils import load_config
+from data import create_data_loaders
+from models import ResNet50
+from training import calculate_classification_metrics
 
 
 def validate_model(config_path, model_path, detailed=False):
