@@ -12,7 +12,11 @@ dependencies = [
     "Pillow",
     "tqdm",
     "PyYAML",
-    "transformers"
+    "transformers",
+    
+    "dvc",
+
+    "mlflow"
 ]
 
 [project.optional-dependencies]
@@ -70,11 +74,14 @@ ignore = [
     "D", "S"
 ]
 
+[tool.mlflow]
+tracking_uri = "file:./mlruns"
+experiment_name = "default"
+
 [build-system]
 requires = [
     "setuptools",
     "wheel",
-    "taskipy",
-    "dvc"
+    "taskipy"
 ]
 build-backend = "setuptools.build_meta"

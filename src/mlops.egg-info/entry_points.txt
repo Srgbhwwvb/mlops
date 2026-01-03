@@ -1,5 +1,0 @@
-[console_scripts]
-predict = predict:main
-setup_data = setup_data:main
-train = train:main
-validate = validate:main

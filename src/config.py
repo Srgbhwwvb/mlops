@@ -17,6 +17,14 @@ class DataConfig:
         self.val_size = float(config["val_size"])
         self.random_seed = int(config["random_seed"])
 
+    def into_dict(self) -> dict[str, Any]:
+        return {
+            "train_path": self.train_path,
+            "test_path": self.test_path,
+            "val_size": self.val_size,
+            "random_seed": self.random_seed,
+        }
+
 
 class ModelConfig:
     name: str
@@ -28,6 +36,13 @@ class ModelConfig:
         self.name = str(config["name"])
         self.num_classes = int(config["num_classes"])
         self.pretrained = bool(config["pretrained"])
+
+    def into_dict(self) -> dict[str, Any]:
+        return {
+            "name": self.name,
+            "num_classes": self.num_classes,
+            "pretrained": self.pretrained,
+        }
 
 
 class TrainingConfig:
@@ -50,6 +65,18 @@ class TrainingConfig:
         self.optimizer = str(config["optimizer"])
         self.scheduler = str(config["scheduler"])
         self.scheduler_config = config["scheduler_config"]
+
+    def into_dict(self) -> dict[str, Any]:
+        return {
+            "batch_size": self.batch_size,
+            "epochs": self.epochs,
+            "learning_rate": self.learning_rate,
+            "weight_decay": self.weight_decay,
+            "patience": self.patience,
+            "optimizer": self.optimizer,
+            "scheduler": self.scheduler,
+            "scheduler_config": self.scheduler_config,
+        }
 
 
 class TransformConfig:
@@ -81,6 +108,18 @@ class TransformConfig:
 
         self.val = config.get("val")
 
+    def into_dict(self) -> dict[str, Any]:
+        return {
+            "image_size": self.image_size,
+            "mean": self.mean,
+            "std": self.std,
+            "train": {
+                "RandomHorizontalFlip": self.random_horizontal_flip,
+                "RandomRotation": self.random_rotation,
+            },
+            "val": self.val,
+        }
+
 
 class OutputConfig:
     log_dir: Path
@@ -92,6 +131,13 @@ class OutputConfig:
         self.log_dir = Path(config["log_dir"])
         self.model_dir = Path(config["model_dir"])
         self.save_frequency = int(config["save_frequency"])
+
+    def into_dict(self) -> dict[str, Any]:
+        return {
+            "log_dir": self.log_dir,
+            "model_dir": self.model_dir,
+            "save_frequency": self.save_frequency,
+        }
 
 
 class Config:
@@ -121,6 +167,15 @@ class Config:
                 return Config(config)
             except Exception as e:
                 raise ValueError(f"Error during loading config `{config_path}`") from e
+
+    def into_dict(self) -> dict[str, Any]:
+        return {
+            "data": self.data_config.into_dict(),
+            "model": self.model_config.into_dict(),
+            "training": self.training_config.into_dict(),
+            "transforms": self.transform_config.into_dict(),
+            "output": self.output_config.into_dict(),
+        }
 
 
 def save_config(config: dict[str, Any], save_path: Path) -> None:

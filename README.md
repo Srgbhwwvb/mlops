@@ -64,7 +64,10 @@ pip install -e ".[dev, test]"
 2. линтер: `task lint`;
 3. форматтер: `task fmt`.
 
-## Подготовка данных:
+## Данные
+
+Проект использует `DVC` для хранения датасетов и весов моделей.
+
 1. скачать датасет с Kaggle: [https://www.kaggle.com/c/plant-seedlings-classification/data], распаковать;
 2. в файле `configs/train_config.yaml`:
   data:
@@ -87,8 +90,14 @@ pip install -e ".[dev, test]"
   
   `python check_coverage.py`
 
+## MLFlow
+
+В проект интегрирован MLFlow. Хранилище расположено локально внутри проекта в папке `./mlruns`.
+
+Вход:
+  `mlflow ui`
+
 ## Результаты на тестовой выборке:
 * Accuracy: 0.9663
 * Macro F1-Score: 0.9634
-
 
