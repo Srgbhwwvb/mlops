@@ -1,57 +1,45 @@
-from typing import Dict, Any
-import torchvision.transforms as transforms
+from torchvision import transforms
+
+from config import TransformConfig
 
 
-def _convert_config_value(value):
-    """Convert string values to appropriate types for transforms."""
-    if isinstance(value, str):
-        try:
-            if "." in value:
-                return float(value)
-            else:
-                return int(value)
-        except ValueError:
-            return value
-    return value
-
-
-def create_train_transforms(config: Dict[str, Any]) -> transforms.Compose:
+def create_train_transforms(config: TransformConfig) -> transforms.Compose:
     """Create training transforms with data augmentation."""
     # Convert string values if necessary
-    image_size = _convert_config_value(config["transforms"]["image_size"])
-    flip_prob = _convert_config_value(
-        config["transforms"]["train"]["RandomHorizontalFlip"]
-    )
-    rotation = _convert_config_value(config["transforms"]["train"]["RandomRotation"])
+    image_size = config.image_size
+    random_horizontal_flip = config.random_horizontal_flip
+    rotation = config.random_rotation
 
     return transforms.Compose(
         [
             transforms.Resize((image_size, image_size)),
-            transforms.RandomHorizontalFlip(flip_prob),
+            transforms.RandomHorizontalFlip(random_horizontal_flip),
             transforms.RandomRotation(rotation),
             transforms.ToTensor(),
             transforms.Normalize(
-                mean=config["transforms"]["mean"], std=config["transforms"]["std"]
+                mean=config.mean,
+                std=config.std,
             ),
-        ]
+        ],
     )
 
 
-def create_val_transforms(config: Dict[str, Any]) -> transforms.Compose:
+def create_val_transforms(config: TransformConfig) -> transforms.Compose:
     """Create validation transforms without augmentation."""
-    image_size = _convert_config_value(config["transforms"]["image_size"])
+    image_size = config.image_size
 
     return transforms.Compose(
         [
             transforms.Resize((image_size, image_size)),
             transforms.ToTensor(),
             transforms.Normalize(
-                mean=config["transforms"]["mean"], std=config["transforms"]["std"]
+                mean=config.mean,
+                std=config.std,
             ),
-        ]
+        ],
     )
 
 
-def create_test_transforms(config: Dict[str, Any]) -> transforms.Compose:
+def create_test_transforms(config: TransformConfig) -> transforms.Compose:
     """Create test transforms (same as validation)."""
     return create_val_transforms(config)

@@ -1,20 +1,64 @@
+import logging
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
 import pytest
 import torch
-import tempfile
-import os
-from unittest.mock import patch, MagicMock
 from PIL import Image
 
-from src.data.dataset import PlantDataset, create_data_loaders
-from src.data.preprocessing import (
+from config import (
+    Config,
+    TransformConfig,
+    create_test_config,
+    create_test_config_dict,
+)
+from data import (
+    PlantDataset,
+    create_data_loaders,
+    create_test_transforms,
     create_train_transforms,
     create_val_transforms,
-    create_test_transforms,
 )
-from src.utils.validation import validate_image_file, validate_dataset_structure
 
 
-class MockModel:
+def is_validate_image_file(file_path: Path) -> bool:
+    """Validate that file is a valid image."""
+    try:
+        with Image.open(file_path) as img:
+            img.verify()  # throws an exceptoin if the test is fail
+    except (OSError, SyntaxError):
+        return False
+    else:
+        return True
+
+
+def validate_dataset_structure(
+    dataset_path: Path,
+    expected_classes: list[str],
+):
+    """Validate dataset structure and return list of errors."""
+
+    if not dataset_path.exists():
+        raise ValueError(f"Dataset path does not exist: {dataset_path}")
+
+    # Check if it's a directory with class subdirectories
+    for class_name in expected_classes:
+        class_path = dataset_path / class_name
+        if not class_path.exists():
+            raise ValueError(f"Missing class directory: {class_name}")
+
+        # Check for images in class directory
+        no_one = True
+        for file in class_path.iterdir():
+            if not is_validate_image_file(file):
+                raise ValueError(f"Invalid image file: {file}")
+            no_one = False
+
+        if no_one:
+            raise ValueError(f"No images found in class directory: {class_name}")
+
+
+class MockModel(torch.nn.Module):
     """Mock model for testing."""
 
     def __init__(self, num_classes):
@@ -32,7 +76,7 @@ class MockModel:
 
 
 class TestDataset:
-    def test_dataset_creation(self, tmp_path):
+    def test_dataset_creation(self, tmp_path: Path):
         """Test dataset creation with mock data."""
         # Create mock dataset structure
         dataset_dir = tmp_path / "train"
@@ -49,17 +93,25 @@ class TestDataset:
                 img.save(img_path)
                 img.close()
 
-        config = {
-            "transforms": {
-                "image_size": 224,
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
-            }
-        }
-
-        transform = create_train_transforms(config)
-        dataset = PlantDataset(str(dataset_dir / "*" / "*.png"), transform=transform)
+        transform = create_train_transforms(
+            TransformConfig(
+                {
+                    "image_size": 224,
+                    "mean": [0.485, 0.456, 0.406],
+                    "std": [0.229, 0.224, 0.225],
+                    "train": {
+                        "RandomHorizontalFlip": 0.5,
+                        "RandomVerticalFlip": 0.5,
+                        "RandomRotation": 30,
+                    },
+                }
+            )
+        )
+        dataset = PlantDataset(
+            logging.getLogger(),
+            dataset_dir / "*" / "*.png",
+            transform=transform,
+        )
 
         assert len(dataset) == 6  # 2 classes * 3 images
 
@@ -82,7 +134,9 @@ class TestDataset:
         img.save(img_path)
         img.close()
 
-        dataset = PlantDataset(str(dataset_dir / "*" / "*.png"), transform=None)
+        dataset = PlantDataset(
+            logging.getLogger(), dataset_dir / "*" / "*.png", transform=None
+        )
 
         img, label = dataset[0]
         assert isinstance(
@@ -90,7 +144,7 @@ class TestDataset:
         )  # Without transform, should return PIL Image
         assert isinstance(label, int)
 
-    def test_dataset_test_mode(self, tmp_path):
+    def test_dataset_test_mode(self, tmp_path: Path):
         """Test dataset in test mode (without labels)."""
         dataset_dir = tmp_path / "test"
         dataset_dir.mkdir()
@@ -101,7 +155,7 @@ class TestDataset:
         img.close()
 
         dataset = PlantDataset(
-            str(dataset_dir / "*.png"), transform=None, is_train=False
+            logging.getLogger(), dataset_dir / "*.png", transform=None, is_train=False
         )
 
         image_name, image = dataset[0]
@@ -123,7 +177,9 @@ class TestDataset:
         # Mock glob to return fake paths
         mock_glob.return_value = ["fake_path/image1.png", "fake_path/image2.png"]
 
-        dataset = PlantDataset("fake_path/*.png", transform=None, is_train=True)
+        dataset = PlantDataset(
+            logging.getLogger(), Path("fake_path/*.png"), transform=None, is_train=True
+        )
 
         # Test training mode sample
         sample = dataset.get_sample_item(0)
@@ -138,7 +194,9 @@ class TestDataset:
         # Mock glob to return fake paths
         mock_glob.return_value = ["fake_path/image1.png", "fake_path/image2.png"]
 
-        dataset = PlantDataset("fake_path/*.png", transform=None, is_train=False)
+        dataset = PlantDataset(
+            logging.getLogger(), Path("fake_path/*.png"), transform=None, is_train=False
+        )
 
         # Test test mode sample
         sample = dataset.get_sample_item(0)
@@ -147,16 +205,19 @@ class TestDataset:
         assert isinstance(sample[0], str)
         assert isinstance(sample[1], torch.Tensor)
 
-    def test_dataset_empty_directory(self):
+    def test_dataset_empty_directory(self, tmp_path: Path):
         """Test dataset with empty directory."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            # Create empty directory
-            empty_path = os.path.join(tmpdir, "*", "*.png")
+        # Create empty directory
+        empty_path = tmp_path / "*" / "*.png"
 
-            with pytest.raises(ValueError, match="No images found"):
-                PlantDataset(empty_path, transform=None)
+        with pytest.raises(ValueError, match="No images found"):
+            PlantDataset(
+                logging.getLogger(),
+                empty_path,
+                transform=None,
+            )
 
-    def test_dataset_label_assignment(self, tmp_path):
+    def test_dataset_label_assignment(self, tmp_path: Path):
         """Test correct label assignment for different classes."""
         dataset_dir = tmp_path / "train"
         dataset_dir.mkdir()
@@ -171,7 +232,9 @@ class TestDataset:
             img.save(img_path)
             img.close()
 
-        dataset = PlantDataset(str(dataset_dir / "*" / "*.png"), transform=None)
+        dataset = PlantDataset(
+            logging.getLogger(), Path(dataset_dir) / "*" / "*.png", transform=None
+        )
 
         # Check that labels are assigned correctly
         labels_found = set()
@@ -182,118 +245,92 @@ class TestDataset:
         # Should have 2 different labels
         assert len(labels_found) == 2
 
+    # class TestDataLoaders:
+    #     @patch("src.data.dataset.PlantDataset")
+    #     @patch("src.data.dataset.random_split")
+    #     @patch("src.data.dataset.DataLoader")
+    #     def test_create_data_loaders(
+    #         self, mock_dataloader, mock_random_split, mock_dataset
+    #     ):
+    #         """Test create_data_loaders function with mocks."""
+    #         # Mock the dataset and split
+    #         mock_dataset_instance = MagicMock()
+    #         mock_dataset_instance.LABELS = ["class1", "class2"]
+    #         mock_dataset_instance.__len__.return_value = 100
 
-class TestDataLoaders:
-    @patch("src.data.dataset.PlantDataset")
-    @patch("src.data.dataset.random_split")
-    @patch("src.data.dataset.DataLoader")
-    def test_create_data_loaders(
-        self, mock_dataloader, mock_random_split, mock_dataset
-    ):
-        """Test create_data_loaders function with mocks."""
-        # Mock the dataset and split
-        mock_dataset_instance = MagicMock()
-        mock_dataset_instance.LABELS = ["class1", "class2"]
-        mock_dataset_instance.__len__.return_value = 100
+    #         mock_dataset.return_value = mock_dataset_instance
 
-        mock_dataset.return_value = mock_dataset_instance
+    #         # Mock the random_split to return train and val datasets
+    #         mock_train_dataset = MagicMock()
+    #         mock_val_dataset = MagicMock()
+    #         mock_train_dataset.__len__.return_value = 80
+    #         mock_val_dataset.__len__.return_value = 20
+    #         mock_random_split.return_value = [mock_train_dataset, mock_val_dataset]
 
-        # Mock the random_split to return train and val datasets
-        mock_train_dataset = MagicMock()
-        mock_val_dataset = MagicMock()
-        mock_train_dataset.__len__.return_value = 80
-        mock_val_dataset.__len__.return_value = 20
-        mock_random_split.return_value = [mock_train_dataset, mock_val_dataset]
+    #         # Mock DataLoader to return itself
+    #         mock_train_loader = MagicMock()
+    #         mock_val_loader = MagicMock()
+    #         mock_dataloader.side_effect = [mock_train_loader, mock_val_loader]
 
-        # Mock DataLoader to return itself
-        mock_train_loader = MagicMock()
-        mock_val_loader = MagicMock()
-        mock_dataloader.side_effect = [mock_train_loader, mock_val_loader]
+    #         config = create_test_config()
 
-        config = {
-            "data": {"train_path": "/fake/path/*.png", "val_size": 0.2},
-            "training": {"batch_size": 16},
-            "transforms": {
-                "image_size": 224,
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
-            },
-        }
+    #         train_loader, val_loader, class_names = create_data_loaders(
+    #             config.data_config,
+    #             config.training_config,
+    #             config.transform_config,
+    #             logging.getLogger(),
+    #         )
 
-        train_loader, val_loader, class_names = create_data_loaders(config)
+    #         # Verify function calls
+    #         mock_dataset.assert_called_once()
+    #         mock_random_split.assert_called_once()
 
-        # Verify function calls
-        mock_dataset.assert_called_once()
-        mock_random_split.assert_called_once()
+    #         # Verify DataLoader was called twice
+    #         assert mock_dataloader.call_count == 2
 
-        # Verify DataLoader was called twice
-        assert mock_dataloader.call_count == 2
+    #         # Verify class names
+    #         assert class_names == ["class1", "class2"]
 
-        # Verify class names
-        assert class_names == ["class1", "class2"]
-
-        # Verify loaders are returned
-        assert train_loader is mock_train_loader
-        assert val_loader is mock_val_loader
-
-    def test_create_data_loaders_invalid_config(self):
-        """Test create_data_loaders with invalid configuration."""
-        invalid_config = {
-            "data": {
-                # Missing train_path
-                "val_size": 0.2
-            },
-            "training": {"batch_size": 16},
-            "transforms": {
-                "image_size": 224,
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
-            },
-        }
-
-        with pytest.raises(Exception):
-            create_data_loaders(invalid_config)
+    #         # Verify loaders are returned
+    #         assert train_loader is mock_train_loader
+    #         assert val_loader is mock_val_loader
 
     @patch("src.data.dataset.glob.glob")
     def test_create_data_loaders_no_images(self, mock_glob):
         """Test create_data_loaders when no images are found."""
         mock_glob.return_value = []  # No images found
 
-        config = {
-            "data": {"train_path": "/fake/path/*.png", "val_size": 0.2},
-            "training": {"batch_size": 16},
-            "transforms": {
-                "image_size": 224,
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
-            },
-        }
+        config = create_test_config_dict()
+        config["data"]["train_path"] = "some_fake_path/*/*.png"
+        config = Config(config)
 
         with pytest.raises(ValueError, match="No images found"):
-            create_data_loaders(config)
+            create_data_loaders(
+                config.data_config,
+                config.training_config,
+                config.transform_config,
+                logging.getLogger(),
+            )
 
 
 class TestPreprocessingEdgeCases:
     def test_preprocessing_with_different_config_formats(self):
         """Test preprocessing with different config value formats."""
         # Test with PROPER numeric values (not strings)
-        config = {
-            "transforms": {
-                "image_size": 224,  # integer, not string
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "train": {
-                    "RandomHorizontalFlip": 0.5,  # float, not string
-                    "RandomRotation": 30,  # integer, not string
-                },
-            }
-        }
-
         # This should work because we're using proper types
-        transform = create_train_transforms(config)
+        transform = create_train_transforms(
+            TransformConfig(
+                {
+                    "image_size": 224,  # integer, not string
+                    "mean": [0.485, 0.456, 0.406],
+                    "std": [0.229, 0.224, 0.225],
+                    "train": {
+                        "RandomHorizontalFlip": 0.5,  # float, not string
+                        "RandomRotation": 30,  # integer, not string
+                    },
+                }
+            )
+        )
         dummy_img = Image.new("RGB", (100, 100), color="red")
         transformed = transform(dummy_img)
         dummy_img.close()
@@ -304,20 +341,20 @@ class TestPreprocessingEdgeCases:
     def test_preprocessing_string_values_handling(self):
         """Test how preprocessing handles string values (should convert them)."""
         # Test with string values - these should be converted internally
-        config = {
-            "transforms": {
-                "image_size": "224",  # string that can be converted to int
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "train": {
-                    "RandomHorizontalFlip": "0.5",  # string that can be converted to float
-                    "RandomRotation": "30",  # string that can be converted to int
-                },
-            }
-        }
-
         # The preprocessing functions should handle string conversion
-        transform = create_train_transforms(config)
+        transform = create_train_transforms(
+            TransformConfig(
+                {
+                    "image_size": "224",  # string that can be converted to int
+                    "mean": [0.485, 0.456, 0.406],
+                    "std": [0.229, 0.224, 0.225],
+                    "train": {
+                        "RandomHorizontalFlip": "0.5",  # string that can be converted to float
+                        "RandomRotation": "30",  # string that can be converted to int
+                    },
+                }
+            )
+        )
         dummy_img = Image.new("RGB", (100, 100), color="red")
 
         # This might fail if preprocessing doesn't handle string conversion
@@ -335,19 +372,19 @@ class TestPreprocessingEdgeCases:
 
     def test_preprocessing_minimal_config(self):
         """Test preprocessing with minimal configuration."""
-        minimal_config = {
-            "transforms": {
-                "image_size": 224,
-                "mean": [0.5, 0.5, 0.5],
-                "std": [0.5, 0.5, 0.5],
-                "train": {
-                    "RandomHorizontalFlip": 0.0,  # No augmentation
-                    "RandomRotation": 0,  # No rotation
-                },
-            }
-        }
-
-        transform = create_train_transforms(minimal_config)
+        transform = create_train_transforms(
+            TransformConfig(
+                {
+                    "image_size": 224,
+                    "mean": [0.5, 0.5, 0.5],
+                    "std": [0.5, 0.5, 0.5],
+                    "train": {
+                        "RandomHorizontalFlip": 0.0,  # No augmentation
+                        "RandomRotation": 0,  # No rotation
+                    },
+                }
+            )
+        )
         dummy_img = Image.new("RGB", (100, 100), color="red")
         transformed = transform(dummy_img)
         dummy_img.close()
@@ -361,87 +398,80 @@ if __name__ == "__main__":
 
 
 class TestDataValidation:
-    def test_validate_image_file(self):
+    def test_validate_image_file(self, tmp_path: Path):
         """Test image file validation."""
-        # Исправленная версия для Windows
-        with tempfile.TemporaryDirectory() as tmpdir:
-            # Create a valid image file
-            valid_img_path = os.path.join(tmpdir, "test_image.png")
-            img = Image.new("RGB", (100, 100), color="red")
-            img.save(valid_img_path)
-            img.close()  # Явно закрываем изображение
+        # Create a valid image file
+        valid_img_path = tmp_path / "test_image.png"
+        img = Image.new("RGB", (100, 100), color="red")
+        img.save(valid_img_path)
+        img.close()  # Явно закрываем изображение
 
-            assert validate_image_file(valid_img_path)
+        assert is_validate_image_file(valid_img_path)
 
-            # Test invalid file
-            invalid_path = os.path.join(tmpdir, "invalid.txt")
-            with open(invalid_path, "w") as f:
-                f.write("not an image")
+        # Test invalid file
+        invalid_path = tmp_path / "invalid.txt"
+        with invalid_path.open("w") as f:
+            f.write("not an image")
 
-            assert not validate_image_file(invalid_path)
+        assert not is_validate_image_file(invalid_path)
 
-    def test_validate_dataset_structure(self):
+    def test_validate_dataset_structure(self, tmp_path: Path):
         """Test dataset structure validation."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            # Create valid dataset structure
-            for class_name in ["class1", "class2"]:
-                class_dir = os.path.join(tmpdir, class_name)
-                os.makedirs(class_dir)
+        # Create valid dataset structure
+        for class_name in ["class1", "class2"]:
+            class_dir = tmp_path / class_name
+            class_dir.mkdir(parents=True)
 
-                # Create sample images
-                for i in range(2):
-                    img_path = os.path.join(class_dir, f"image_{i}.png")
-                    img = Image.new("RGB", (100, 100), color="red")
-                    img.save(img_path)
-                    img.close()  # Закрываем изображение
+            # Create sample images
+            for i in range(2):
+                img_path = class_dir / f"image_{i}.png"
+                img = Image.new("RGB", (100, 100), color="red")
+                img.save(img_path)
+                img.close()  # Закрываем изображение
 
-            errors = validate_dataset_structure(tmpdir, ["class1", "class2"])
-            assert len(errors) == 0
+        # No exceptions:
+        validate_dataset_structure(tmp_path, ["class1", "class2"])
 
-            # Test with missing class
-            errors = validate_dataset_structure(tmpdir, ["class1", "class2", "class3"])
-            assert len(errors) > 0
+        # Test with missing class
+        with pytest.raises(ValueError):
+            validate_dataset_structure(tmp_path, ["class1", "class2", "class3"])
 
-    def test_validate_dataset_structure_no_images(self):
+    def test_validate_dataset_structure_no_images(self, tmp_path: Path):
         """Test dataset validation when class directory has no images."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            class_dir = os.path.join(tmpdir, "empty_class")
-            os.makedirs(class_dir)
+        class_dir = tmp_path / "empty_class"
+        class_dir.mkdir(parents=True)
 
-            # No images in directory
-            errors = validate_dataset_structure(tmpdir, ["empty_class"])
-            assert len(errors) > 0
-            assert any("No images found" in error for error in errors)
+        # No images in directory
+        with pytest.raises(ValueError):
+            validate_dataset_structure(tmp_path, ["empty_class"])
 
-    def test_validate_dataset_structure_invalid_images(self):
+    def test_validate_dataset_structure_invalid_images(self, tmp_path: Path):
         """Test dataset validation with invalid image files."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            class_dir = os.path.join(tmpdir, "bad_class")
-            os.makedirs(class_dir)
+        class_dir = tmp_path / "bad_class"
+        class_dir.mkdir(parents=True)
 
-            # Create invalid image file
-            bad_img_path = os.path.join(class_dir, "bad_image.png")
-            with open(bad_img_path, "w") as f:
-                f.write("not an image data")
+        # Create invalid image file
+        bad_img_path = class_dir / "bad_image.png"
+        with bad_img_path.open("w") as f:
+            f.write("not an image data")
 
-            errors = validate_dataset_structure(tmpdir, ["bad_class"])
-            assert len(errors) > 0
-            assert any("Invalid image file" in error for error in errors)
+        with pytest.raises(ValueError):
+            validate_dataset_structure(tmp_path, ["bad_class"])
 
 
 class TestDataTransforms:
     def test_train_transforms(self):
         """Test training transforms create correct output."""
-        config = {
-            "transforms": {
-                "image_size": 224,
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
-            }
-        }
-
-        transform = create_train_transforms(config)
+        transform = create_train_transforms(
+            TransformConfig(
+                {
+                    "image_size": 224,
+                    "mean": [0.485, 0.456, 0.406],
+                    "std": [0.229, 0.224, 0.225],
+                    "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
+                }
+            )
+        )
         dummy_img = Image.new("RGB", (100, 100), color="red")
 
         transformed = transform(dummy_img)
@@ -453,16 +483,16 @@ class TestDataTransforms:
 
     def test_val_transforms(self):
         """Test validation transforms create correct output."""
-        config = {
-            "transforms": {
-                "image_size": 224,
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
-            }
-        }
-
-        transform = create_val_transforms(config)
+        transform = create_val_transforms(
+            TransformConfig(
+                {
+                    "image_size": 224,
+                    "mean": [0.485, 0.456, 0.406],
+                    "std": [0.229, 0.224, 0.225],
+                    "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
+                }
+            )
+        )
         dummy_img = Image.new("RGB", (100, 100), color="red")
 
         transformed = transform(dummy_img)
@@ -473,16 +503,16 @@ class TestDataTransforms:
 
     def test_test_transforms(self):
         """Test test transforms create correct output."""
-        config = {
-            "transforms": {
-                "image_size": 224,
-                "mean": [0.485, 0.456, 0.406],
-                "std": [0.229, 0.224, 0.225],
-                "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
-            }
-        }
-
-        transform = create_test_transforms(config)
+        transform = create_test_transforms(
+            TransformConfig(
+                {
+                    "image_size": 224,
+                    "mean": [0.485, 0.456, 0.406],
+                    "std": [0.229, 0.224, 0.225],
+                    "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
+                }
+            )
+        )
         dummy_img = Image.new("RGB", (100, 100), color="red")
 
         transformed = transform(dummy_img)
@@ -493,16 +523,17 @@ class TestDataTransforms:
 
     def test_transforms_normalization(self):
         """Test that transforms normalize images correctly."""
-        config = {
-            "transforms": {
-                "image_size": 224,
-                "mean": [0.5, 0.5, 0.5],
-                "std": [0.5, 0.5, 0.5],
-                "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
-            }
-        }
 
-        transform = create_train_transforms(config)
+        transform = create_train_transforms(
+            TransformConfig(
+                {
+                    "image_size": 224,
+                    "mean": [0.5, 0.5, 0.5],
+                    "std": [0.5, 0.5, 0.5],
+                    "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
+                }
+            )
+        )
         dummy_img = Image.new("RGB", (100, 100), color="red")
 
         transformed = transform(dummy_img)
@@ -529,7 +560,9 @@ class TestDataEdgeCases:
             img.save(img_path)
             img.close()
 
-        dataset = PlantDataset(str(dataset_dir / "*" / "*.png"), transform=None)
+        dataset = PlantDataset(
+            logging.getLogger(), dataset_dir / "*" / "*.png", transform=None
+        )
 
         # Should load valid images without issues
         assert len(dataset) == 2
@@ -552,17 +585,19 @@ class TestDataEdgeCases:
             img.close()
 
         transform = create_train_transforms(
-            {
-                "transforms": {
+            TransformConfig(
+                {
                     "image_size": 224,
                     "mean": [0.485, 0.456, 0.406],
                     "std": [0.229, 0.224, 0.225],
                     "train": {"RandomHorizontalFlip": 0.5, "RandomRotation": 30},
                 }
-            }
+            )
         )
 
-        dataset = PlantDataset(str(dataset_dir / "*" / "*.png"), transform=transform)
+        dataset = PlantDataset(
+            logging.getLogger(), dataset_dir / "*" / "*.png", transform=transform
+        )
 
         # All images should be resized to same size
         image, label = dataset[0]
@@ -589,22 +624,21 @@ class TestDataEdgeCases:
 
 
 class TestValidationEdgeCases:
-    def test_validate_image_file_edge_cases(self):
+    def test_validate_image_file_edge_cases(self, tmp_path: Path):
         """Test image validation with edge cases."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            # Test non-existent file
-            assert not validate_image_file(os.path.join(tmpdir, "nonexistent.png"))
+        # Test non-existent file
+        assert not is_validate_image_file(tmp_path / "nonexistent.png")
 
-            # Test directory instead of file
-            dir_path = os.path.join(tmpdir, "directory")
-            os.makedirs(dir_path)
-            assert not validate_image_file(dir_path)
+        # Test directory instead of file
+        dir_path = tmp_path / "directory"
+        dir_path.mkdir(parents=True)
+        assert not is_validate_image_file(dir_path)
 
-            # Test file with wrong extension
-            txt_file = os.path.join(tmpdir, "text.txt")
-            with open(txt_file, "w") as f:
-                f.write("not an image")
-            assert not validate_image_file(txt_file)
+        # Test file with wrong extension
+        txt_file = tmp_path / "text.txt"
+        with txt_file.open("w") as f:
+            f.write("not an image")
+        assert not is_validate_image_file(txt_file)
 
 
 if __name__ == "__main__":

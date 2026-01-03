@@ -1,9 +1,12 @@
-import torch
 from unittest.mock import Mock
-from src.training.trainer import PlantTrainer
+
+import torch
+
+from config import Config, create_test_config, create_test_config_dict
+from training import PlantTrainer
 
 
-class MockModel:
+class MockModel(torch.nn.Module):
     def __init__(self, num_classes):
         self.num_classes = num_classes
 
@@ -31,26 +34,7 @@ def test_trainer_initialization():
     val_loader = Mock()
     device = torch.device("cpu")
 
-    config = {
-        "training": {
-            "learning_rate": 0.001,
-            "weight_decay": 0.001,
-            "batch_size": 16,
-            "epochs": 2,
-            "patience": 3,
-            "scheduler_config": {"mode": "min", "factor": 0.5, "patience": 2},
-        },
-        "data": {"val_size": 0.2, "random_seed": 42},
-        "transforms": {
-            "image_size": 224,
-            "train": {
-                "RandomHorizontalFlip": 0.5,
-                "RandomVerticalFlip": 0.3,
-                "RandomRotation": 30,
-            },
-        },
-        "output": {"save_frequency": 1},
-    }
+    config = create_test_config()
 
     class_names = ["class1", "class2", "class3"]
 
@@ -65,31 +49,14 @@ def test_trainer_config_conversion():
     val_loader = Mock()
     device = torch.device("cpu")
 
-    config = {
-        "training": {
-            "learning_rate": "0.001",  # строка должна преобразоваться в float
-            "weight_decay": "0.001",
-            "batch_size": "16",
-            "epochs": "2",
-            "patience": "3",
-            "scheduler_config": {"mode": "min", "factor": "0.5", "patience": "2"},
-        },
-        "data": {"val_size": "0.2", "random_seed": "42"},
-        "transforms": {
-            "image_size": "224",
-            "train": {
-                "RandomHorizontalFlip": "0.5",
-                "RandomVerticalFlip": "0.3",
-                "RandomRotation": "30",
-            },
-        },
-        "output": {"save_frequency": "1"},
-    }
+    config = create_test_config_dict()
+    config["training"]["learning_rate"] = "0.001"  # must be parsed as float
+    config = Config(config)
 
     class_names = ["class1", "class2", "class3"]
 
     trainer = PlantTrainer(model, train_loader, val_loader, device, config, class_names)
 
     # Проверяем что конфиг преобразован правильно
-    assert isinstance(trainer.config["training"]["learning_rate"], float)
-    assert trainer.config["training"]["learning_rate"] == 0.001
+    assert isinstance(trainer.config.training_config.learning_rate, float)
+    assert trainer.config.training_config.learning_rate == 0.001

@@ -79,7 +79,7 @@ pip install -e ".[dev, test]"
 
 * Для загрузки весов лучшей обученной модели и запуска валидации:
   
-  `validate.py --config configs/train_config.yaml --model_path models/best_model`
+  `validate --config configs/train_config.yaml --model_path models/best_model`
 
   `predict --config configs/train_config.yaml --image data/initial_data/test/0a64e3e6c.png --model models/best_model`
   

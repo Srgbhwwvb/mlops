@@ -11,6 +11,7 @@ def check_coverage():
     # Запускаем тесты с покрытием
     result = subprocess.run(
         [sys.executable, "-m", "pytest", "tests/", "--cov=src", "--cov-report=term"],
+        check=False,
         capture_output=True,
         text=True,
     )

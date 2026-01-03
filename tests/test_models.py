@@ -1,4 +1,6 @@
 import torch
+
+from config import ModelConfig
 from src.models.resnet import ResNet50, ResNetConfig
 
 
@@ -36,6 +38,12 @@ def test_resnet_forward_pass():
 
 def test_resnet_from_config():
     """Test creating ResNet from config dictionary."""
-    config_dict = {"model": {"num_classes": 8}}
+    config_dict = ModelConfig(
+        {
+            "name": "resnet50",
+            "num_classes": 8,
+            "pretrained": True,
+        }
+    )
     model = ResNet50.from_config(config_dict)
     assert model.config.num_classes == 8

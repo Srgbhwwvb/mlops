@@ -1,14 +1,15 @@
-import torch.nn as nn
-import torchvision.models as models
-from transformers import PreTrainedModel, PretrainedConfig
 import torch
-from typing import Dict, Any
+from torch import nn
+from torchvision import models
+from transformers import PretrainedConfig, PreTrainedModel
+
+from config import ModelConfig
 
 
 class ResNetConfig(PretrainedConfig):
     model_type = "resnet"
 
-    def __init__(self, num_classes=12, **kwargs):
+    def __init__(self, num_classes: int = 12, **kwargs) -> None:  # noqa: ANN003
         super().__init__(**kwargs)
         self.num_classes = num_classes
 
@@ -16,19 +17,21 @@ class ResNetConfig(PretrainedConfig):
 class ResNet50(PreTrainedModel):
     config_class = ResNetConfig
 
-    def __init__(self, config):
-        super().__init__(config)
-        self.model = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1)
-        self.model.fc = nn.Linear(2048, config.num_classes)
+    def __init__(self, model_config: ResNetConfig) -> None:
+        super().__init__(model_config)
+        self.model: nn.Module = models.resnet50(
+            weights=models.ResNet50_Weights.IMAGENET1K_V1
+        )
+        self.model.fc = nn.Linear(2048, model_config.num_classes)
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor):
         return self.model(x)
 
     @classmethod
-    def from_config(cls, config: Dict[str, Any]):
+    def from_config(cls, model_config: ModelConfig) -> "ResNet50":
         """Create model from configuration dictionary."""
-        model_config = ResNetConfig(num_classes=config["model"]["num_classes"])
-        return cls(model_config)
+        res_net_config = ResNetConfig(num_classes=model_config.num_classes)
+        return cls(res_net_config)
 
     def get_expected_input_shape(self) -> tuple:
         """Get expected input shape for testing."""

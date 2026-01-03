@@ -1,23 +1,38 @@
+import logging
+from typing import Any
+
+import pandas as pd
 import torch
 import torch.nn.functional as F
 from torch.optim import Adam
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-import logging
 from tqdm import tqdm
-import pandas as pd
-import os
-from typing import Dict, Any
+
+from config import Config
 
 from .metrics import calculate_classification_metrics
 
 
 class PlantTrainer:
-    def __init__(self, model, train_loader, val_loader, device, config, class_names):
+    model: torch.nn.Module
+    device: torch.device
+    config: Config
+    class_names: list[str]
+
+    def __init__(
+        self,
+        model: torch.nn.Module,
+        train_loader,
+        val_loader,
+        device: torch.device,
+        config: Config,
+        class_names: list[str],
+    ):
         self.model = model
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.device = device
-        self.config = self._validate_and_convert_config(config)
+        self.config = config
         self.class_names = class_names
 
         self.optimizer = self._create_optimizer()
@@ -34,66 +49,23 @@ class PlantTrainer:
             "val_loss": [],
         }
 
-    def _validate_and_convert_config(self, config: Dict) -> Dict:
-        """Validate and convert config values to proper types."""
-        converted_config = config.copy()
-
-        # Convert training parameters
-        training_config = converted_config["training"]
-        training_config["learning_rate"] = float(training_config["learning_rate"])
-        training_config["weight_decay"] = float(training_config["weight_decay"])
-        training_config["batch_size"] = int(training_config["batch_size"])
-        training_config["epochs"] = int(training_config["epochs"])
-        training_config["patience"] = int(training_config["patience"])
-
-        # Convert scheduler parameters
-        scheduler_config = training_config["scheduler_config"]
-        scheduler_config["factor"] = float(scheduler_config["factor"])
-        scheduler_config["patience"] = int(scheduler_config["patience"])
-
-        # Convert data parameters
-        data_config = converted_config["data"]
-        data_config["val_size"] = float(data_config["val_size"])
-        data_config["random_seed"] = int(data_config["random_seed"])
-
-        # Convert transform parameters
-        transforms_config = converted_config["transforms"]
-        transforms_config["image_size"] = int(transforms_config["image_size"])
-
-        train_transforms = transforms_config["train"]
-        train_transforms["RandomHorizontalFlip"] = float(
-            train_transforms["RandomHorizontalFlip"]
-        )
-        train_transforms["RandomVerticalFlip"] = float(
-            train_transforms["RandomVerticalFlip"]
-        )
-        train_transforms["RandomRotation"] = int(train_transforms["RandomRotation"])
-
-        # Convert output parameters
-        output_config = converted_config["output"]
-        output_config["save_frequency"] = int(output_config.get("save_frequency", 1))
-
-        logging.info("Config validation and conversion completed successfully")
-        return converted_config
-
     def _create_optimizer(self) -> Adam:
         """Create optimizer with validated parameters."""
-        lr = self.config["training"]["learning_rate"]
-        weight_decay = self.config["training"]["weight_decay"]
+        lr = self.config.training_config.learning_rate
+        weight_decay = self.config.training_config.weight_decay
         return Adam(self.model.parameters(), lr=lr, weight_decay=weight_decay)
 
     def _create_scheduler(self) -> ReduceLROnPlateau:
         """Create learning rate scheduler."""
-        scheduler_config = self.config["training"]["scheduler_config"]
+        scheduler_config = self.config.training_config.scheduler_config
         return ReduceLROnPlateau(
             self.optimizer,
             mode=scheduler_config["mode"],
             factor=scheduler_config["factor"],
             patience=scheduler_config["patience"],
-            # verbose=True,
         )
 
-    def train_epoch(self, epoch: int) -> Dict[str, float]:
+    def train_epoch(self, epoch: int) -> dict[str, float]:
         """Train for one epoch and return metrics."""
         self.model.train()
         total_loss: float = 0.0
@@ -130,12 +102,12 @@ class PlantTrainer:
 
         logging.info(
             f"Train Epoch {epoch} - Accuracy: {metrics['accuracy']:.4f}, "
-            f"Macro-F1: {metrics['macro_f1']:.4f}, Loss: {metrics['loss']:.4f}"
+            f"Macro-F1: {metrics['macro_f1']:.4f}, Loss: {metrics['loss']:.4f}",
         )
 
         return metrics
 
-    def validate(self) -> Dict[str, float]:
+    def validate(self) -> dict[str, float]:
         """Validate model and return metrics."""
         self.model.eval()
         val_loss: float = 0.0
@@ -157,17 +129,17 @@ class PlantTrainer:
 
         logging.info(
             f"Validation - Accuracy: {metrics['accuracy']:.4f}, "
-            f"Macro-F1: {metrics['macro_f1']:.4f}, Loss: {metrics['loss']:.4f}"
+            f"Macro-F1: {metrics['macro_f1']:.4f}, Loss: {metrics['loss']:.4f}",
         )
 
         return metrics
 
-    def train(self) -> Dict[str, Any]:
+    def train(self) -> dict[str, Any]:
         """Full training loop."""
         logging.info("Starting training...")
 
-        epochs = self.config["training"]["epochs"]
-        patience = self.config["training"]["patience"]
+        epochs = self.config.training_config.epochs
+        patience = self.config.training_config.patience
 
         logging.info(f"Training for {epochs} epochs")
         logging.info(f"Early stopping patience: {patience}")
@@ -198,26 +170,25 @@ class PlantTrainer:
                 self.patience_counter = 0
 
                 # Save in Hugging Face format
-                save_path = os.path.join(
-                    self.config["output"]["model_dir"], "best_model"
-                )
-                os.makedirs(save_path, exist_ok=True)
+                save_path = self.config.output_config.model_dir / "best_model"
+
+                save_path.mkdir(parents=True, exist_ok=True)
                 self.model.save_pretrained(save_path)
                 logging.info(
-                    f"Saved best model with Macro-F1: {val_metrics['macro_f1']:.4f}"
+                    f"Saved best model with Macro-F1: {val_metrics['macro_f1']:.4f}",
                 )
             else:
                 self.patience_counter += 1
                 logging.info(
-                    f" No improvement. Patience counter: {self.patience_counter}/{patience}"
+                    f" No improvement. Patience counter: {self.patience_counter}/{patience}",
                 )
                 if self.patience_counter >= patience:
                     logging.info(f" Early stopping at epoch {epoch}")
                     break
 
         # Save final model
-        final_path = os.path.join(self.config["output"]["model_dir"], "final_model")
-        os.makedirs(final_path, exist_ok=True)
+        final_path = self.config.output_config.model_dir / "final_model"
+        final_path.mkdir(parents=True, exist_ok=True)
         self.model.save_pretrained(final_path)
         logging.info("Saved final model")
 
@@ -242,17 +213,16 @@ class PlantTrainer:
                 "val_accuracy": self.metrics["val_accuracy"],
                 "val_macro_f1": self.metrics["val_f1"],
                 "val_loss": self.metrics["val_loss"],
-            }
+            },
         )
 
-        os.makedirs(self.config["output"]["model_dir"], exist_ok=True)
-        metrics_path = os.path.join(
-            self.config["output"]["model_dir"], "training_metrics.csv"
-        )
+        self.config.output_config.model_dir.mkdir(parents=True, exist_ok=True)
+        metrics_path = self.config.output_config.model_dir / "training_metrics.csv"
+
         metrics_df.to_csv(metrics_path, index=False)
         logging.info(f"Metrics saved to {metrics_path}")
 
-    def get_training_summary(self) -> Dict[str, Any]:
+    def get_training_summary(self) -> dict[str, Any]:
         """Get summary of training results."""
         if not self.metrics["train_accuracy"]:
             return {}
@@ -266,12 +236,12 @@ class PlantTrainer:
             "total_epochs_trained": len(self.metrics["train_accuracy"]),
         }
 
-    def mock_training_step(self, batch_size: int = 2) -> Dict[str, float]:
+    def mock_training_step(self, batch_size: int = 2) -> dict[str, float]:
         """Mock training step for testing without real data."""
         # Create mock data
         mock_data = torch.randn(batch_size, 3, 224, 224).to(self.device)
         mock_target = torch.randint(0, len(self.class_names), (batch_size,)).to(
-            self.device
+            self.device,
         )
 
         # Training step

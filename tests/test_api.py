@@ -1,17 +1,17 @@
+import numpy as np
 import pytest
 import torch
-import numpy as np
 
-from src.api.predictor import PlantPredictor
+from api import PlantPredictor
 
 
-class MockModel:
+class MockModel(torch.nn.Module):
     """Mock model for testing."""
 
-    def __init__(self, num_classes):
+    def __init__(self, num_classes: int) -> None:
         self.num_classes = num_classes
 
-    def __call__(self, x):
+    def __call__(self, x: torch.Tensor):
         batch_size = x.shape[0]
         # Return random logits
         return torch.randn(batch_size, self.num_classes)
@@ -106,7 +106,8 @@ class TestPredictorEdgeCases:
         # With zero inputs, softmax should give equal probabilities
         expected_prob = 1.0 / 3.0
         assert np.allclose(probabilities, expected_prob, atol=0.01)
-        assert (classes >= 0).all() and (classes < 3).all()
+        assert (classes >= 0).all()
+        assert (classes < 3).all()
 
     def test_predictor_with_very_small_images(self):
         """Test predictor with unusually small input images."""

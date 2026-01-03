@@ -1,120 +1,128 @@
 #!/usr/bin/env python3
 import argparse
-import os
-import glob
-from PIL import Image
-import torch
+import logging
+import sys
+from pathlib import Path
+from typing import Any
 
-from models import ResNet50
-from data import PlantDataset, create_val_transforms
+import torch
+from PIL import Image
+
 from api import PlantPredictor
-from utils import load_config
+from config import Config
+from data import PlantDataset, create_val_transforms
+from models import ResNet50
 
 
 def predict_single_image(
-    model_path, image_path, config_path="configs/train_config.yaml"
-):
+    model_path: Path,
+    image_path: Path,
+    config: Config,
+    logger: logging.Logger,
+) -> dict[str, Any]:
     """Predict plant class for a single image using PlantPredictor"""
     # Load model and class names
     model = ResNet50.from_pretrained(model_path)
     class_names = PlantDataset.LABELS
-
-    # Load config for transforms
-    config = load_config(config_path)
 
     # Create predictor instance
     device = "cuda" if torch.cuda.is_available() else "cpu"
     predictor = PlantPredictor(model, class_names, device)
 
     # Create transforms
-    transform = create_val_transforms(config)
+    transform = create_val_transforms(config.transform_config)
 
     # Load and preprocess image
-    image = Image.open(image_path).convert("RGB")
-    input_tensor = transform(image).unsqueeze(0)  # Add batch dimension
+    try:
+        image = Image.open(image_path).convert("RGB")
+        input_tensor = transform(image).unsqueeze(0)  # Add batch dimension
 
-    # Use existing predictor
-    predictions = predictor.predict(input_tensor)
-    result = predictions[0]  # Single image in batch
-
-    # Display results
-    print(f"Image: {os.path.basename(image_path)}")
-    print(f"Predicted class: {result['class_name']} (index: {result['class_index']})")
-    print(f"Confidence: {result['confidence']:.4f}")
-
-    # Show top-3 predictions
-    print("\nTop-3 predictions:")
-    sorted_probs = sorted(
-        result["probabilities"].items(), key=lambda x: x[1], reverse=True
-    )[:3]
-    for i, (class_name, prob) in enumerate(sorted_probs):
-        print(f"  {i + 1}. {class_name}: {prob:.4f}")
-
-    return result
+        # Use existing predictor
+        predictions = predictor.predict(input_tensor)
+        return predictions[0]  # Single image in batch
+    except Exception:
+        logger.exception(f"Error processing {image_path}")
+        raise
 
 
-def predict_batch(model_path, folder_path, config_path="configs/train_config.yaml"):
+def predict_batch(
+    model_path: Path,
+    folder_path: Path,
+    config: Config,
+    logger: logging.Logger,
+) -> dict[Path, dict[str, Any]]:
     """Predict plant classes for all images in a folder"""
     # Load model and setup
     model = ResNet50.from_pretrained(model_path)
     class_names = PlantDataset.LABELS
-    config = load_config(config_path)
+
     device = "cuda" if torch.cuda.is_available() else "cpu"
     predictor = PlantPredictor(model, class_names, device)
-    transform = create_val_transforms(config)
+    transform = create_val_transforms(config.transform_config)
 
     # Find all images
-    image_extensions = ["*.png", "*.jpg", "*.jpeg", "*.bmp"]
-    image_paths = []
-    for extension in image_extensions:
-        image_paths.extend(glob.glob(os.path.join(folder_path, extension)))
+    image_paths = list(folder_path.glob("*.png"))
 
-    print(f"Found {len(image_paths)} images in {folder_path}")
-
-    results = []
+    results: dict[Path, dict[str, Any]] = {}
     for image_path in image_paths:
         try:
             image = Image.open(image_path).convert("RGB")
             input_tensor = transform(image).unsqueeze(0)
             prediction = predictor.predict(input_tensor)[0]
 
-            results.append(
-                {"image": os.path.basename(image_path), "prediction": prediction}
-            )
-
-            print(
-                f"\n{os.path.basename(image_path)}: {prediction['class_name']} "
-                f"(confidence: {prediction['confidence']:.4f})"
-            )
-
-        except Exception as e:
-            print(f"Error processing {image_path}: {e}")
+            results[image_path] = prediction
+        except Exception:
+            logger.exception(f"Error processing {image_path}")
+            raise
 
     return results
 
 
-def main():
+def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Predict plant class using PlantPredictor"
+        description="Predict plant class using PlantPredictor",
     )
     parser.add_argument(
-        "--model_path", type=str, required=True, help="Path to trained model directory"
+        "--model_path",
+        type=str,
+        required=True,
+        help="Path to trained model directory",
     )
-    parser.add_argument("--image", type=str, help="Path to single image")
-    parser.add_argument("--folder", type=str, help="Path to folder with images")
+    parser.add_argument("--image", type=Path, help="Path to single image")
+    parser.add_argument("--folder", type=Path, help="Path to folder with images")
     parser.add_argument(
         "--config",
-        type=str,
+        type=Path,
         default="configs/train_config.yaml",
         help="Path to config file",
     )
 
     args = parser.parse_args()
 
+    config = Config.from_file(args.config)
+
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    logger = logging.getLogger(__name__)
+
     if args.image:
-        predict_single_image(args.model_path, args.image, args.config)
+        result = predict_single_image(args.model_path, args.image, config, logger)
+
+        print("\nTop 3 predictions:")
+        sorted_probs = sorted(
+            result["probabilities"].items(),
+            key=lambda x: x[1],
+            reverse=True,
+        )[:3]
+        for i, (class_name, prob) in enumerate(sorted_probs):
+            print(f"  {i + 1}. {class_name}: {prob:.4f}")
+        print(f"Confidence: {result['confidence']:.4f}")
+
     elif args.folder:
-        predict_batch(args.model_path, args.folder, args.config)
+        result = predict_batch(args.model_path, args.folder, config, logger)
+
+        for png, res in result.items():
+            print(f"{png}: {res['class_name']} (index: {res['class_index']})")
+
     else:
         print("Please specify either --image or --folder")
 

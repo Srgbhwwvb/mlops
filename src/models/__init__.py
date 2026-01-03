@@ -1,7 +1,6 @@
-from .resnet import ResNet50
-from .resnet import ResNetConfig
+from .resnet import ResNet50, ResNetConfig
 
 __all__ = [
     "ResNet50",
-    "ResNetConfig"
+    "ResNetConfig",
 ]

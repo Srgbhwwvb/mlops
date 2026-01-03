@@ -1,11 +1,11 @@
-from sklearn.metrics import f1_score, accuracy_score
 import numpy as np
-from typing import List, Dict
+from sklearn.metrics import accuracy_score, f1_score
 
 
 def calculate_classification_metrics(
-    predictions: List[int], targets: List[int]
-) -> Dict[str, float]:
+    predictions: list[int],
+    targets: list[int],
+) -> dict[str, float]:
     """Calculate classification metrics."""
     accuracy = accuracy_score(targets, predictions)
     macro_f1 = f1_score(targets, predictions, average="macro")

@@ -1,10 +1,13 @@
-import torch
+from typing import Any
+
 import numpy as np
-from typing import Dict, Any, List
+import torch
 
 
 class PlantPredictor:
-    def __init__(self, model, class_names: List[str], device: str = "cpu"):
+    def __init__(
+        self, model: torch.nn.Module, class_names: list[str], device: str = "cpu"
+    ) -> None:
         self.model = model
         self.class_names = class_names
         self.device = device
@@ -29,11 +32,13 @@ class PlantPredictor:
         return np.argmax(probabilities, axis=1)
 
     def format_predictions(
-        self, class_indices: np.ndarray, probabilities: np.ndarray
-    ) -> List[Dict[str, Any]]:
+        self,
+        class_indices: np.ndarray,
+        probabilities: np.ndarray,
+    ) -> list[dict[str, Any]]:
         """Format predictions for API response."""
         predictions = []
-        for idx, prob in zip(class_indices, probabilities):
+        for idx, prob in zip(class_indices, probabilities, strict=True):
             predictions.append(
                 {
                     "class_index": int(idx),
@@ -42,11 +47,11 @@ class PlantPredictor:
                     "probabilities": {
                         self.class_names[i]: float(p) for i, p in enumerate(prob)
                     },
-                }
+                },
             )
         return predictions
 
-    def predict(self, batch: torch.Tensor) -> List[Dict[str, Any]]:
+    def predict(self, batch: torch.Tensor) -> list[dict[str, Any]]:
         """Complete prediction pipeline."""
         probabilities = self.predict_proba(batch)
         class_indices = self.predict_classes(batch)
