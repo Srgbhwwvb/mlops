@@ -54,7 +54,7 @@ class PlantDataset(Dataset):
     def __len__(self) -> int:
         return len(self.img_paths)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx):  # ty:ignore[invalid-method-override]
         img_path: Path = self.img_paths[idx]
         image = Image.open(img_path).convert("RGB")
 
@@ -153,7 +153,7 @@ def create_data_loaders(
     val_dataset = dataset_parts[1]
 
     # Apply val transform to validation set
-    val_dataset.dataset.transform = val_transform
+    val_dataset.dataset.transform = val_transform  # ty:ignore[unresolved-attribute]
 
     # Create data loaders
     train_loader = DataLoader(

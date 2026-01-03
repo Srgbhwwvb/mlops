@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import logging
-import sys
 from pathlib import Path
 
 import torch
@@ -29,8 +28,8 @@ def train_model(config: Config, logger: logging.Logger):
             config.transform_config,
             logger,
         )
-        logging.info(f"Loaded {len(train_loader.dataset)} training images")
-        logging.info(f"Loaded {len(val_loader.dataset)} validation images")
+        logging.info(f"Loaded {len(train_loader.dataset)} training images")  # ty:ignore[invalid-argument-type]
+        logging.info(f"Loaded {len(val_loader.dataset)} validation images")  # ty:ignore[invalid-argument-type]
         logging.info(f"Classes: {class_names}")
     except Exception as e:
         logging.exception(f"Error creating data loaders: {e}")
@@ -42,7 +41,8 @@ def train_model(config: Config, logger: logging.Logger):
         model = ResNet50(model_config)
         model.to(device)
         logging.info(
-            f"Initialized {config.model_config.name} model with {config.model_config.num_classes} classes",
+            f"Initialized {config.model_config.name} model "
+            f"with {config.model_config.num_classes} classes",
         )
     except Exception as e:
         logging.exception(f"Error creating model: {e}")

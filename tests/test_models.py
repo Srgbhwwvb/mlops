@@ -18,7 +18,7 @@ def test_resnet_creation():
 
     assert model is not None
     # Проверяем что последний слой имеет правильное количество выходов
-    assert model.model.fc.out_features == 12
+    assert model.model.fc.out_features == 12  # ty:ignore[possibly-missing-attribute]
 
 
 def test_resnet_forward_pass():

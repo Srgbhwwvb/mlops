@@ -29,8 +29,8 @@ test = [
 ]
 
 [tool.taskipy.tasks]
-lint = "ruff check src tests ; ty check src tests"
-fmt  = "ruff format src tests"
+lint = "ruff check & ty check"
+fmt  = "ruff format"
 test = "pytest tests/ -v"
 
 predict    = "predict"
@@ -66,6 +66,7 @@ select = [
 ignore = [
     "G004", "COM812", 
     "TRY003", "EM101", "EM102", "T201",
+    "PTH207",
     "D", "S"
 ]
 

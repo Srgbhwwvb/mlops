@@ -13,16 +13,16 @@ class MockModel(torch.nn.Module):
     def __call__(self, x):
         return torch.randn(x.shape[0], self.num_classes)
 
-    def train(self):
+    def train(self):  # ty:ignore[invalid-method-override]
         pass
 
     def eval(self):
         pass
 
-    def parameters(self):
+    def parameters(self):  # ty:ignore[invalid-method-override]
         return [torch.nn.Parameter(torch.randn(10, 10))]
 
-    def to(self, device):
+    def to(self, device):  # ty:ignore[invalid-method-override]
         return self
 
 

@@ -1,6 +1,6 @@
 import logging
 from pathlib import Path
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 import torch
@@ -9,7 +9,6 @@ from PIL import Image
 from config import (
     Config,
     TransformConfig,
-    create_test_config,
     create_test_config_dict,
 )
 from data import (
@@ -68,7 +67,7 @@ class MockModel(torch.nn.Module):
         batch_size = x.shape[0]
         return torch.randn(batch_size, self.num_classes)
 
-    def to(self, device):
+    def to(self, device):  # ty:ignore[invalid-method-override]
         return self
 
     def eval(self):
@@ -349,8 +348,10 @@ class TestPreprocessingEdgeCases:
                     "mean": [0.485, 0.456, 0.406],
                     "std": [0.229, 0.224, 0.225],
                     "train": {
-                        "RandomHorizontalFlip": "0.5",  # string that can be converted to float
-                        "RandomRotation": "30",  # string that can be converted to int
+                        # string that can be converted to float:
+                        "RandomHorizontalFlip": "0.5",
+                        # string that can be converted to int:
+                        "RandomRotation": "30",
                     },
                 }
             )
@@ -539,7 +540,8 @@ class TestDataTransforms:
         transformed = transform(dummy_img)
         dummy_img.close()
 
-        # Check that values are normalized (should be between -1 and 1 for this mean/std)
+        # Check that values are normalized
+        # (should be between -1 and 1 for this mean/std)
         assert transformed.min() >= -3.0  # Allow some tolerance
         assert transformed.max() <= 3.0
 

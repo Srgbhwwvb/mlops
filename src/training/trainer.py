@@ -173,14 +173,15 @@ class PlantTrainer:
                 save_path = self.config.output_config.model_dir / "best_model"
 
                 save_path.mkdir(parents=True, exist_ok=True)
-                self.model.save_pretrained(save_path)
+                self.model.save_pretrained(save_path)  # ty:ignore[call-non-callable]
                 logging.info(
                     f"Saved best model with Macro-F1: {val_metrics['macro_f1']:.4f}",
                 )
             else:
                 self.patience_counter += 1
                 logging.info(
-                    f" No improvement. Patience counter: {self.patience_counter}/{patience}",
+                    f" No improvement. "
+                    f"Patience counter: {self.patience_counter}/{patience}",
                 )
                 if self.patience_counter >= patience:
                     logging.info(f" Early stopping at epoch {epoch}")
@@ -189,7 +190,7 @@ class PlantTrainer:
         # Save final model
         final_path = self.config.output_config.model_dir / "final_model"
         final_path.mkdir(parents=True, exist_ok=True)
-        self.model.save_pretrained(final_path)
+        self.model.save_pretrained(final_path)  # ty:ignore[call-non-callable]
         logging.info("Saved final model")
 
         # Save metrics

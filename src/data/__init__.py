@@ -6,7 +6,7 @@ from .preprocessing import (
 )
 
 __all__ = [
-    "Dataset",
+    "PlantDataset",
     "create_data_loaders",
     "create_test_transforms",
     "create_train_transforms",

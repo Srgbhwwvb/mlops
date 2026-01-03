@@ -29,7 +29,7 @@ def validate_model(config: Config, model_path: Path, logger: logging.Logger) -> 
         config.transform_config,
         logger,
     )
-    logger.info(f"Loaded {len(val_loader.dataset)} validation images")
+    logger.info(f"Loaded {len(val_loader.dataset)} validation images")  # ty:ignore[invalid-argument-type]
     logger.info(f"Classes: {class_names}")
 
     # Load model
@@ -78,7 +78,7 @@ def validate_model(config: Config, model_path: Path, logger: logging.Logger) -> 
 
     # Confusion matrix
     cm = confusion_matrix(all_targets, all_predictions)
-    cm_df = pd.DataFrame(cm, index=class_names, columns=class_names)
+    cm_df = pd.DataFrame(cm, index=class_names, columns=class_names)  # ty:ignore[invalid-argument-type]
     logger.info(f"\nConfusion Matrix:\n{cm_df}")
 
 

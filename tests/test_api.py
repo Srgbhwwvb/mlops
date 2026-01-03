@@ -9,14 +9,14 @@ class MockModel(torch.nn.Module):
     """Mock model for testing."""
 
     def __init__(self, num_classes: int) -> None:
-        self.num_classes = num_classes
+        self.num_classes = num_classes  # ty:ignore[unresolved-attribute]
 
     def __call__(self, x: torch.Tensor):
         batch_size = x.shape[0]
         # Return random logits
         return torch.randn(batch_size, self.num_classes)
 
-    def to(self, device):
+    def to(self, device):  # ty:ignore[invalid-method-override]
         return self
 
     def eval(self):
@@ -95,7 +95,7 @@ class TestPredictorEdgeCases:
 
         model = ZeroOutputModel(3)
         class_names = ["class1", "class2", "class3"]
-        predictor = PlantPredictor(model, class_names)
+        predictor = PlantPredictor(model, class_names)  # ty:ignore[invalid-argument-type]
 
         batch = torch.randn(2, 3, 224, 224)
 
