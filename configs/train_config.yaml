@@ -1,3 +1,7 @@
+# API configuration
+api:
+  port: 25565
+
 # Data configuration
 data:
   # train_path: "C:/Users/Alex/Downloads/plant-seedlings-classification/train/*/*.png"

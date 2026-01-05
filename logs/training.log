@@ -329,3 +329,67 @@ received: <class 'models.resnet.ResNet50'>
 2026-01-03 21:02:45,474 - root - INFO - Training completed successfully!
 2026-01-03 21:02:45,475 - root - INFO -  Training summary: {'best_val_f1': 0.9212015855361564, 'final_train_accuracy': 0.7963157894736842, 'final_val_accuracy': 0.9294736842105263, 'final_train_loss': 0.6469569029990866, 'final_val_loss': 0.20471155910115493, 'total_epochs_trained': 1}
 2026-01-03 21:03:00,186 - train - INFO - Run ID: cb03191104d94863803d1d0ae7b63b03
+2026-01-04 22:12:59,540 - train - INFO - Start training with config: C:\Users\Alex\Documents\mlops\configs\train_config.yaml
+2026-01-04 22:13:01,998 - root - INFO - Starting plant classification training
+2026-01-04 22:13:01,998 - train - INFO - Learning rate from config: 0.0001
+2026-01-04 22:13:01,998 - root - INFO - Using device: cpu
+2026-01-04 22:13:02,248 - train - INFO - DATASET STATISTICS:
+2026-01-04 22:13:02,248 - train - INFO -   Total images: 4750
+2026-01-04 22:13:02,248 - train - INFO -   Number of classes: 12
+2026-01-04 22:13:02,254 - train - INFO -   Class distribution:
+2026-01-04 22:13:02,254 - train - INFO -     Loose Silky-bent: 654 images (13.8%)
+2026-01-04 22:13:02,254 - train - INFO -     Common Chickweed: 611 images (12.9%)
+2026-01-04 22:13:02,254 - train - INFO -     Scentless Mayweed: 516 images (10.9%)
+2026-01-04 22:13:02,254 - train - INFO -     Small-flowered Cranesbill: 496 images (10.4%)
+2026-01-04 22:13:02,254 - train - INFO -     Fat Hen: 475 images (10.0%)
+2026-01-04 22:13:02,254 - train - INFO -     Charlock: 390 images (8.2%)
+2026-01-04 22:13:02,254 - train - INFO -     Sugar beet: 385 images (8.1%)
+2026-01-04 22:13:02,258 - train - INFO -     Cleavers: 287 images (6.0%)
+2026-01-04 22:13:02,258 - train - INFO -     Black-grass: 263 images (5.5%)
+2026-01-04 22:13:02,258 - train - INFO -     Shepherds Purse: 231 images (4.9%)
+2026-01-04 22:13:02,258 - train - INFO -     Common wheat: 221 images (4.7%)
+2026-01-04 22:13:02,258 - train - INFO -     Maize: 221 images (4.7%)
+2026-01-04 22:13:02,258 - train - INFO -   Class imbalance ratio: 2.96
+2026-01-04 22:13:02,275 - root - INFO - Loaded 3800 training images
+2026-01-04 22:13:02,275 - root - INFO - Loaded 950 validation images
+2026-01-04 22:13:02,275 - root - INFO - Classes: ['Black-grass', 'Charlock', 'Cleavers', 'Common Chickweed', 'Common wheat', 'Fat Hen', 'Loose Silky-bent', 'Maize', 'Scentless Mayweed', 'Shepherds Purse', 'Small-flowered Cranesbill', 'Sugar beet']
+2026-01-04 22:13:02,915 - root - INFO - Initialized resnet50 model with 12 classes
+2026-01-04 22:13:02,915 - root - INFO - Starting training...
+2026-01-04 22:13:02,915 - root - INFO - Training for 1 epochs
+2026-01-04 22:13:02,915 - root - INFO - Early stopping patience: 5
+2026-01-04 22:13:02,925 - root - INFO - 
+==================================================
+2026-01-04 22:13:02,925 - root - INFO - Epoch 1/1
+2026-01-04 22:13:02,925 - root - INFO - ==================================================
+2026-01-04 22:26:03,189 - root - INFO - Train Epoch 1 - Accuracy: 0.7937, Macro-F1: 0.7680, Loss: 0.6519
+2026-01-04 22:27:28,996 - root - INFO - Validation - Accuracy: 0.9074, Macro-F1: 0.8961, Loss: 0.2718
+2026-01-04 22:27:29,309 - root - INFO - Saved best model with Macro-F1: 0.8961
+2026-01-04 22:27:29,407 - root - INFO - Saved final model
+2026-01-04 22:27:29,445 - root - INFO - Metrics saved to models\training_metrics.csv
+2026-01-04 22:27:29,445 - root - INFO - Training completed!
+2026-01-04 22:27:29,445 - root - INFO - Training completed successfully!
+2026-01-04 22:27:29,445 - root - INFO -  Training summary: {'best_val_f1': 0.8960707419589147, 'final_train_accuracy': 0.7936842105263158, 'final_val_accuracy': 0.9073684210526316, 'final_train_loss': 0.651929344794079, 'final_val_loss': 0.27184395961071317, 'total_epochs_trained': 1}
+2026-01-04 22:27:51,027 - train - INFO - Run ID: 841d436efb46487ab89d6aa3a334c326
+2026-01-04 22:52:33,946 - predict_server - INFO - New file recieved
+2026-01-04 22:52:33,948 - predict_server - ERROR - Error
+Traceback (most recent call last):
+  File "C:\Users\Alex\Documents\mlops\src\predict_server.py", line 28, in predict_image
+    image = Image.open(content).convert("RGB")
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Alex\Documents\mlops\.venv\Lib\site-packages\PIL\Image.py", line 3493, in open
+    fp = builtins.open(filename, "rb")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte
+2026-01-04 22:58:56,699 - predict_server - INFO - New file recieved
+2026-01-04 22:58:56,699 - predict_server - ERROR - Error
+Traceback (most recent call last):
+  File "C:\Users\Alex\Documents\mlops\src\predict_server.py", line 29, in predict_image
+    image = Image.open(content).convert("RGB")
+            ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Alex\Documents\mlops\.venv\Lib\site-packages\PIL\Image.py", line 3493, in open
+    fp = builtins.open(filename, "rb")
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0x89 in position 0: invalid start byte
+2026-01-04 23:01:01,196 - predict_server - INFO - New file recieved
+2026-01-04 23:01:59,322 - predict_server - INFO - New file recieved
+2026-01-04 23:02:35,021 - predict_server - INFO - New file recieved

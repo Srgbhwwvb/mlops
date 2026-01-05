@@ -174,6 +174,7 @@ class PlantTrainer:
 
                 save_path.mkdir(parents=True, exist_ok=True)
                 self.model.save_pretrained(save_path)  # ty:ignore[call-non-callable]
+                torch.save(self.model.state_dict(), save_path / "model_weights.pth")
                 logging.info(
                     f"Saved best model with Macro-F1: {val_metrics['macro_f1']:.4f}",
                 )
@@ -191,6 +192,7 @@ class PlantTrainer:
         final_path = self.config.output_config.model_dir / "final_model"
         final_path.mkdir(parents=True, exist_ok=True)
         self.model.save_pretrained(final_path)  # ty:ignore[call-non-callable]
+        torch.save(self.model.state_dict(), final_path / "model_weights.pth")
         logging.info("Saved final model")
 
         # Save metrics

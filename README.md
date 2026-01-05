@@ -48,8 +48,13 @@
 git clone https://github.com/Srgbhwwvb/mlops.git
 cd mlops
 python -m venv .venv
+
+# Linux/MacOs:
 source .venv/bin/activate
-pip install -e ".[dev, test]"
+# Windows:
+.venv\Scripts\activate
+
+pip install -e ".[dev, test, mlflow, api]"
 ```
 Проект использует `pyproject.toml` для своего управления.
 
@@ -64,38 +69,52 @@ pip install -e ".[dev, test]"
 2. линтер: `task lint`;
 3. форматтер: `task fmt`.
 
+Определены следующие скрипты с человеко-читаемым выводом:
+1. подготовка данных: `setup_data --config configs/train_config.yaml`;
+2. обучение: `train --config configs/train_config.yaml`. По окончанию обучения в папке `./models/final_model` сохраняется последняя эпоха модели, в `/models/best_model` -- эпохи с лучшей метрикой;
+3. валидация: `validate --config configs/train_config.yaml --model_path models/best_model`;
+4. предсказание одного файла: `predict --config configs/train_config.yaml --image data/initial_data/test/0a64e3e6c.png --model models/best_model`;
+5. предсказание файлов в папке: `predict --config configs/train_config.yaml --folder data/initial_data/test/ --model models/best_model`.
+
+Все эти скрипты на вход получают конфигурационный файл. Стандартная конфигурация лежит по пути `./configs/train_config.yaml`.
+
+Имеется апи: `api --config configs/train_config.yaml`, которое принимает по пути `/predict` файл и возвращает предсказанный класс или 400 в случае любой ошибки:
+```
+curl -X POST "http://localhost:PORT/predict" -H "accept: application/json" -F "file=@./data/initial_data/test/0a64e3e6c.png"
+
+# {"class_id":0,"confidence":0.6582537889480591,"class_name":"Black-grass"}
+```
+где `PORT` берётся из конфигурационного файла.
+
+Имеется вспомогательный файл `check_coverage.py` для вывода процента покрытия кода тестами.
+
 ## Данные
 
 Проект использует `DVC` для хранения датасетов и весов моделей.
 
 1. скачать датасет с Kaggle: [https://www.kaggle.com/c/plant-seedlings-classification/data], распаковать;
 2. в файле `configs/train_config.yaml`:
-  data:
-  
-    `train_path: "ВАШ_ПУТЬ/plant-seedlings-classification/train/*/*.png"`
-  
-    `test_path: "ВАШ_ПУТЬ/plant-seedlings-classification/test/*.png"`
-  
-Запуск обучения:
-  
-  `train --config configs/train_config.yaml`
-
-* Для загрузки весов лучшей обученной модели и запуска валидации:
-  
-  `validate --config configs/train_config.yaml --model_path models/best_model`
-
-  `predict --config configs/train_config.yaml --image data/initial_data/test/0a64e3e6c.png --model models/best_model`
-  
-* Для вывода покрытия:
-  
-  `python check_coverage.py`
 
 ## MLFlow
 
 В проект интегрирован MLFlow. Хранилище расположено локально внутри проекта в папке `./mlruns`.
 
-Вход:
-  `mlflow ui`
+Вход в веб-интерфейс: `mlflow ui`.
+
+## Docker
+
+Проект имеет `Dockerfile`:
+```
+docker build -t mlops:v1 .
+```
+Внутри докера крутится вышеуказанное API для предсказания класса картинок по порту 25565:
+```
+docker run -d -p 25565:25565 --name mlops mlops:v1
+
+curl -X POST "http://localhost:PORT/predict" -H "accept: application/json" -F "file=@./data/initial_data/test/0a64e3e6c.png"
+
+# {"class_id":0,"confidence":0.6582537889480591,"class_name":"Black-grass"}
+```
 
 ## Результаты на тестовой выборке:
 * Accuracy: 0.9663

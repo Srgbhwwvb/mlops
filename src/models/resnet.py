@@ -1,6 +1,7 @@
+# from torchvision import models
+import timm
 import torch
 from torch import nn
-from torchvision import models
 from transformers import PretrainedConfig, PreTrainedModel
 
 from config import ModelConfig
@@ -19,8 +20,13 @@ class ResNet50(PreTrainedModel):
 
     def __init__(self, model_config: ResNetConfig) -> None:
         super().__init__(model_config)
-        self.model: nn.Module = models.resnet50(
-            weights=models.ResNet50_Weights.IMAGENET1K_V1
+        # self.model: nn.Module = models.resnet50(
+        #     weights=models.ResNet50_Weights.IMAGENET1K_V1
+        # )
+        self.model = timm.create_model(
+            'resnet50',
+            pretrained=True,
+            num_classes=0,
         )
         self.model.fc = nn.Linear(2048, model_config.num_classes)
 

@@ -4,6 +4,19 @@ from typing import Any
 import yaml
 
 
+class APIConfig:
+    port: int
+
+    def __init__(self, config: dict[str, Any]) -> None:
+        """Init from a dictionary."""
+        self.port = int(config["port"])
+
+    def into_dict(self) -> dict[str, Any]:
+        return {
+            "port": self.port,
+        }
+
+
 class DataConfig:
     train_path: Path
     test_path: Path
@@ -141,6 +154,7 @@ class OutputConfig:
 
 
 class Config:
+    api_config: APIConfig
     data_config: DataConfig
     model_config: ModelConfig
     training_config: TrainingConfig
@@ -149,6 +163,7 @@ class Config:
 
     def __init__(self, config: dict[str, Any]) -> None:
         """Init from a dictionary."""
+        self.api_config = APIConfig(config["api"])
         self.data_config = DataConfig(config["data"])
         self.model_config = ModelConfig(config["model"])
         self.training_config = TrainingConfig(config["training"])
@@ -170,6 +185,7 @@ class Config:
 
     def into_dict(self) -> dict[str, Any]:
         return {
+            "api": self.api_config.into_dict(),
             "data": self.data_config.into_dict(),
             "model": self.model_config.into_dict(),
             "training": self.training_config.into_dict(),
@@ -188,6 +204,7 @@ def save_config(config: dict[str, Any], save_path: Path) -> None:
 def create_test_config_dict() -> dict[str, Any]:
     """Create a minimal test configuration for unit testing."""
     return {
+        "api": {"port": "25565"},
         "data": {
             "train_path": "./data/initial_data/train/*/*.png",
             "test_path": "./data/initial_data/test/*.png",
