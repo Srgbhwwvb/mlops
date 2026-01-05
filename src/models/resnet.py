@@ -24,7 +24,7 @@ class ResNet50(PreTrainedModel):
             pretrained=True,
             num_classes=0,
         )
-        self.model.fc = torch.nn.Linear(2048, model_config.num_classes)
+        self.model.fc = torch.nn.Linear(2048, model_config.num_classes)  # ty:ignore[unresolved-attribute]
 
     def forward(self, x: torch.Tensor):
         return self.model(x)
