@@ -23,7 +23,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        pip install -e ".[test]"
+        pip install ".[test]"
     
     - name: Run tests with coverage
       run: |
@@ -48,7 +48,7 @@ jobs:
     
     - name: Install linting tools
       run: |
-        pip install -e ".[dev, mlflow, api]"
+        pip install ".[dev, test, mlflow, api]"
     
     - name: Lint with ruff and ty
       run: |

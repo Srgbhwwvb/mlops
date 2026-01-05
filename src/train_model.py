@@ -13,6 +13,7 @@ from training import PlantTrainer
 
 try:
     import mlflow
+
     MLFLOW_AVAILABLE = True
 except ImportError:
     MLFLOW_AVAILABLE = False
