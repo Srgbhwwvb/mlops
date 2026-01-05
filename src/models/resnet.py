@@ -19,9 +19,6 @@ class ResNet50(PreTrainedModel):
 
     def __init__(self, model_config: ResNetConfig) -> None:
         super().__init__(model_config)
-        # self.model: nn.Module = models.resnet50(
-        #     weights=models.ResNet50_Weights.IMAGENET1K_V1
-        # )
         self.model = timm.create_model(
             "resnet50",
             pretrained=True,

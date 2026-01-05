@@ -21,4 +21,4 @@ ENV PYTHONPATH=/app
 
 EXPOSE 25565
 
-CMD ["api", "--config", "configs/train_config.yaml"]
+ENTRYPOINT ["api", "--config", "configs/train_config.yaml"]

@@ -95,9 +95,11 @@ curl -X POST "http://localhost:PORT/predict" -H "accept: application/json" -F "f
 1. скачать датасет с Kaggle: [https://www.kaggle.com/c/plant-seedlings-classification/data], распаковать;
 2. в файле `configs/train_config.yaml`:
 
+!!!!!!!!!!!!!!!!!!!!
+
 ## MLFlow
 
-В проект интегрирован MLFlow. Хранилище расположено локально внутри проекта в папке `./mlruns`.
+В проект интегрирован MLFlow. Хранилище расположено локально внутри проекта в папке `./mlruns` и `mlflow.db`.
 
 Вход в веб-интерфейс: `mlflow ui`.
 

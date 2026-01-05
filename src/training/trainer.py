@@ -14,14 +14,14 @@ from .metrics import calculate_classification_metrics
 
 
 class PlantTrainer:
-    model: torch.nn.Module
+    model: torch.nn.Module  # ty:ignore[unresolved-attribute] seems to be an false-positive
     device: torch.device
     config: Config
     class_names: list[str]
 
     def __init__(
         self,
-        model: torch.nn.Module,
+        model: torch.nn.Module,  # ty:ignore[unresolved-attribute] seems to be an false-positive
         train_loader,
         val_loader,
         device: torch.device,
