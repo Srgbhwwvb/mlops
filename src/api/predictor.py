@@ -38,7 +38,7 @@ class PlantPredictor:
     ) -> list[dict[str, Any]]:
         """Format predictions for API response."""
         predictions = []
-        for idx, prob in zip(class_indices, probabilities, strict=True):
+        for idx, prob in zip(class_indices, probabilities):
             predictions.append(
                 {
                     "class_index": int(idx),

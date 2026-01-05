@@ -6,7 +6,6 @@ It is used during building a docker container.
 import timm
 
 model = timm.create_model(
-    'resnet50',
+    "resnet50",
     pretrained=True,
 )
-

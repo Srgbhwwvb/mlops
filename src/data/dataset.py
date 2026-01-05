@@ -2,7 +2,6 @@ import glob
 import logging
 import os
 from collections import Counter
-from collections.abc import Callable
 from pathlib import Path
 
 import torch
@@ -36,7 +35,7 @@ class PlantDataset(Dataset):
         self,
         logger: logging.Logger,
         img_dir: Path,
-        transform: Callable | None = None,
+        transform=None,
         *,
         is_train: bool = True,
     ) -> None:

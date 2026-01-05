@@ -46,7 +46,7 @@ async def predict_image(file: UploadFile = File(...)):
 
 def main() -> None:
     global app, transform, predictor, logger
-#  api --config configs/train_config.yaml
+    #  api --config configs/train_config.yaml
     parser = argparse.ArgumentParser(
         description="API to predict a plant class",
     )

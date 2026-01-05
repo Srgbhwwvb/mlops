@@ -1,4 +1,5 @@
-FROM python:3.12-slim
+# FROM python:3.12-slim
+FROM pytorch/torchserve:latest
 
 WORKDIR /app
 
@@ -8,11 +9,13 @@ COPY src/ ./src/
 COPY configs/ ./configs/
 COPY models/best_model/ ./models/best_model/
 
-RUN pip install --no-cache-dir -e .[api]
+USER root
+RUN pip install --no-cache-dir .[api]
+USER 1000
 
 # resnet50's weights:
-COPY resnet50_weight_download.py .
-RUN python resnet50_weight_download.py
+COPY resnet50_weights_download.py .
+RUN python resnet50_weights_download.py
 
 ENV PYTHONPATH=/app
 

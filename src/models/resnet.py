@@ -24,7 +24,7 @@ class ResNet50(PreTrainedModel):
         #     weights=models.ResNet50_Weights.IMAGENET1K_V1
         # )
         self.model = timm.create_model(
-            'resnet50',
+            "resnet50",
             pretrained=True,
             num_classes=0,
         )
