@@ -23,11 +23,14 @@ jobs:
     
     - name: Install dependencies
       run: |
-        pip install ".[test]"
+      run: |
+        python -m venv .venv
+        source .venv/bin/activate
+        pip install ".[dev, test, mlflow, api]"
     
     - name: Run tests with coverage
       run: |
-        task test
+        pytest tests/ -v --cov=src --cov-report=xml
     
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
@@ -54,4 +57,6 @@ jobs:
 
     - name: Lint with ruff and ty
       run: |
-        task lint
+        ruff format --check
+        ruff check
+        ty check
