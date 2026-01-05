@@ -1,7 +1,6 @@
 # from torchvision import models
 import timm
 import torch
-from torch import nn
 from transformers import PretrainedConfig, PreTrainedModel
 
 from config import ModelConfig
@@ -28,7 +27,7 @@ class ResNet50(PreTrainedModel):
             pretrained=True,
             num_classes=0,
         )
-        self.model.fc = nn.Linear(2048, model_config.num_classes)
+        self.model.fc = torch.nn.Linear(2048, model_config.num_classes)
 
     def forward(self, x: torch.Tensor):
         return self.model(x)
