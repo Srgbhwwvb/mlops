@@ -5,7 +5,7 @@ import torch
 from api import PlantPredictor
 
 
-class MockModel(torch.nn.Module):
+class MockModel(torch.nn.Module):  # ty:ignore[unresolved-attribute] false-positive
     """Mock model for testing."""
 
     def __init__(self, num_classes: int) -> None:

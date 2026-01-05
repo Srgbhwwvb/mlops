@@ -6,7 +6,7 @@ from config import Config, create_test_config, create_test_config_dict
 from training import PlantTrainer
 
 
-class MockModel(torch.nn.Module):
+class MockModel(torch.nn.Module):  # ty:ignore[unresolved-attribute] false-positive
     def __init__(self, num_classes):
         self.num_classes = num_classes
 
@@ -20,7 +20,7 @@ class MockModel(torch.nn.Module):
         pass
 
     def parameters(self):  # ty:ignore[invalid-method-override]
-        return [torch.nn.Parameter(torch.randn(10, 10))]
+        return [torch.nn.Parameter(torch.randn(10, 10))]  # ty:ignore[unresolved-attribute] false-positive
 
     def to(self, device):  # ty:ignore[invalid-method-override]
         return self

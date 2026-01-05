@@ -15,11 +15,13 @@ try:
     import mlflow
     MLFLOW_AVAILABLE = True
 except ImportError:
-    mlflow = None
     MLFLOW_AVAILABLE = False
 
 
-def __train_model_inner(config: Config, logger: logging.Logger,):
+def __train_model_inner(
+    config: Config,
+    logger: logging.Logger,
+):
     if MLFLOW_AVAILABLE:
         mlflow.log_params(config.into_dict())  # ty:ignore[possibly-missing-attribute]
 
@@ -100,7 +102,10 @@ def __train_model_inner(config: Config, logger: logging.Logger,):
         logger.info(f"Run ID: {mlflow.active_run().info.run_id}")  # ty:ignore[possibly-missing-attribute]
 
 
-def train_model(config: Config, logger: logging.Logger,):
+def train_model(
+    config: Config,
+    logger: logging.Logger,
+):
     if MLFLOW_AVAILABLE:
         mlflow.mlflow.set_tracking_uri("sqlite:///mlflow.db")
         mlflow.set_experiment("plant_classification")

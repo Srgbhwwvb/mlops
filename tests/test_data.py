@@ -57,7 +57,7 @@ def validate_dataset_structure(
             raise ValueError(f"No images found in class directory: {class_name}")
 
 
-class MockModel(torch.nn.Module):
+class MockModel(torch.nn.Module):  # ty:ignore[unresolved-attribute] false-positive
     """Mock model for testing."""
 
     def __init__(self, num_classes):

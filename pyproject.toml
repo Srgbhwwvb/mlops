@@ -26,7 +26,9 @@ dev = [
 ]
 test = [
     "pytest>=9.0.2",
-    "pytest-cov>=7.0.0"
+    "pytest-cov>=7.0.0",
+    
+    "taskipy>=1.14.1"
 ]
 mlflow = [
     "mlflow>=3.8.1"
@@ -38,9 +40,9 @@ api = [
 ]
 
 [tool.taskipy.tasks]
-lint = "ruff check & ty check"
+lint = "ruff format --check & ruff check & ty check"
 fmt  = "ruff format"
-test = "pytest tests/ -v"
+test = "pytest tests/ -v --cov=src --cov-report=xml"
 
 [project.scripts]
 predict    = "predict:main"
