@@ -23,8 +23,7 @@ jobs:
     
     - name: Install dependencies
       run: |
-        python -m venv .venv
-        source .venv/bin/activate
+        python -m pip install --upgrade pip
         pip install ".[dev, test, mlflow, api]"
     
     - name: Run tests with coverage
@@ -48,14 +47,13 @@ jobs:
       with:
         python-version: '3.12'
 
-    - name: Install all packages
+    - name: Install dependencies
       run: |
-        python -m venv .venv
-        source .venv/bin/activate
+        python -m pip install --upgrade pip
         pip install ".[dev, test, mlflow, api]"
 
     - name: Lint with ruff and ty
       run: |
-        ruff format --check
-        ruff check
-        ty check
+        python -m ruff format --check
+        python -m ruff check
+        python -m ty check
