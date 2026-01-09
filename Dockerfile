@@ -1,17 +1,17 @@
-# FROM python:3.12-slim
 FROM pytorch/torchserve:latest
 
 WORKDIR /app
 
 COPY pyproject.toml .
-COPY README.md .
-COPY src/ ./src/
-COPY configs/ ./configs/
-COPY models/best_model/ ./models/best_model/
 
 USER root
 RUN pip install --no-cache-dir .[api]
 USER 1000
+
+COPY README.md .
+COPY src/ ./src/
+COPY configs/ ./configs/
+COPY models/best_model/ ./models/best_model/
 
 # resnet50's weights:
 COPY resnet50_weights_download.py .
