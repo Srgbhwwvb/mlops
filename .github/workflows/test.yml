@@ -50,7 +50,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -e ".[dev, test, mlflow, api]"
+        pip install ".[dev, test, mlflow, api]"
 
     - name: Lint with ruff and ty
       run: |
