@@ -58,5 +58,5 @@ jobs:
       run: |
         source .venv/bin/activate
         python -m ruff format --check
-        python -m ruff check src
-        python -m ty check src
+        python -m ruff check
+        python -m ty check
