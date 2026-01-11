@@ -5,6 +5,7 @@
 __pycache__/
 local_dvc_storage
 logs/*
+model_store
 htmlcov
 mlruns
 mlflow.db

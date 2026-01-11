@@ -9,6 +9,7 @@ coverage.xml
 dvc.yaml
 metrics.csv
 mlflow.db
+model_store
 src/predict.py
 src/setup_data.py
 src/train.py

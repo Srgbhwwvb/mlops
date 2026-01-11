@@ -54,7 +54,7 @@ source .venv/bin/activate
 # Windows:
 .venv\Scripts\activate
 
-pip install -e ".[dev, test, mlflow, api]"
+pip install -e ".[dev, test, mlflow, api, torchserve]"
 ```
 Проект использует `pyproject.toml` для своего управления.
 
@@ -90,8 +90,7 @@ curl -X POST "http://localhost:PORT/predict" -H "accept: application/json" -F "f
 
 ## Данные
 
-Проект использует `DVC` для хранения датасетов и весов моделей.
-
+Проект использует `DVC` для хранения датасетов и весов моделей. Хранилище находится на домашнем почтовом сервере, SSH + SFTP.
 
 ## MLFlow
 
@@ -115,6 +114,17 @@ curl -X POST "http://localhost:PORT/predict" -H "accept: application/json" -F "f
 
 # {"class_id":0,"confidence":0.6582537889480591,"class_name":"Black-grass"}
 ```
+
+## TorchServe
+
+Для итогового инференса используетя TorchServe:
+```
+torch-model-archiver --model-name resnet50 --version 1.0 --model-file models/best_model/model.safetensors --serialized-file models/best_model/model_weights.pth --export-path model_store --handler image_classifier
+
+torchserve --start --ncs --model-store model_store --models resnet50.mar --ts-config torchserve.properties
+```
+
+К сожалению, запустить сервис не удалось из-за непонятной Java-ошибки, связанной с невозможностью сгенерировать SSL-сертификат для себя. К тому-же, при повторных запусках TS не может удалить свой же временный файл.
 
 ## Результаты на тестовой выборке:
 * Accuracy: 0.9663
