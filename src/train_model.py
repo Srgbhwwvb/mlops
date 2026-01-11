@@ -49,6 +49,10 @@ def __train_model_inner(
         logging.exception(f"Error creating data loaders: {e}")
         return
 
+    # Сид:
+    if config.training_config.seed:
+        torch.manual_seed(config.training_config.seed)
+
     # Создание модели
     try:
         model_config = ResNetConfig(num_classes=config.model_config.num_classes)

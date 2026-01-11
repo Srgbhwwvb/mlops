@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import yaml
 
@@ -67,6 +67,7 @@ class TrainingConfig:
     optimizer: str
     scheduler: str
     scheduler_config: Any
+    seed: Optional[int]
 
     def __init__(self, config: dict[str, Any]) -> None:
         """Init from a dictionary."""
@@ -77,7 +78,8 @@ class TrainingConfig:
         self.patience = int(config["patience"])
         self.optimizer = str(config["optimizer"])
         self.scheduler = str(config["scheduler"])
-        self.scheduler_config = config["scheduler_config"]
+        self.scheduler_config = (config["scheduler_config"],)
+        self.seed = config.get("seed")
 
     def into_dict(self) -> dict[str, Any]:
         return {
@@ -89,6 +91,7 @@ class TrainingConfig:
             "optimizer": self.optimizer,
             "scheduler": self.scheduler,
             "scheduler_config": self.scheduler_config,
+            "seed": self.seed,
         }
 
 

@@ -1,0 +1,15 @@
+.pytest_cache
+.ruff_cache
+.venv
+.coverage
+__pycache__/
+local_dvc_storage
+logs/*
+htmlcov
+mlruns
+mlflow.db
+src/mlops.egg-info
+metrics.csv
+coverage.xml
+build
+ДЗ.md

@@ -92,10 +92,6 @@ curl -X POST "http://localhost:PORT/predict" -H "accept: application/json" -F "f
 
 Проект использует `DVC` для хранения датасетов и весов моделей.
 
-1. скачать датасет с Kaggle: [https://www.kaggle.com/c/plant-seedlings-classification/data], распаковать;
-2. в файле `configs/train_config.yaml`:
-
-!!!!!!!!!!!!!!!!!!!!
 
 ## MLFlow
 
@@ -105,8 +101,10 @@ curl -X POST "http://localhost:PORT/predict" -H "accept: application/json" -F "f
 
 ## Docker
 
-Проект имеет `Dockerfile`:
+Проект имеет `Dockerfile`. Перед сбором образа необходимо воспользоваться DVC для загрузки модели если этого ещё не сделано:
 ```
+dvc pull
+dvc repro
 docker build -t mlops:v1 .
 ```
 Внутри докера крутится вышеуказанное API для предсказания класса картинок по порту 25565:

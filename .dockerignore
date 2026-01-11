@@ -1,0 +1,17 @@
+.*
+__pycache__/
+local_dvc_storage
+logs
+htmlcov
+mlruns
+check_coverage.py
+coverage.xml
+dvc.yaml
+metrics.csv
+mlflow.db
+src/predict.py
+src/setup_data.py
+src/train.py
+src/validate.py
+src/training
+src/mlops.egg-info

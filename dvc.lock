@@ -1,0 +1,66 @@
+schema: '2.0'
+stages:
+  prepare:
+    cmd: setup_data --config configs/train_config.yaml
+    deps:
+    - path: configs/train_config.yaml
+      hash: md5
+      md5: 62769ead23a33f8c0fd3208825bf9835
+      size: 878
+    - path: data/initial_data
+      hash: md5
+      md5: 04e8b1862e0e68c4fd7a57aa29a60dd5.dir
+      size: 1812532580
+      nfiles: 5544
+    - path: src/setup_data.py
+      hash: md5
+      md5: 4f26ebd23f53584c432e495ec4d44e1e
+      size: 1231
+    outs:
+    - path: data/prepared_data
+      hash: md5
+      md5: d6e95de4cbbf43a7ad6a226fded0ce89
+      size: 235281
+  train:
+    cmd: train --config configs/train_config.yaml
+    deps:
+    - path: configs/train_config.yaml
+      hash: md5
+      md5: 62769ead23a33f8c0fd3208825bf9835
+      size: 878
+    - path: data/prepared_data
+      hash: md5
+      md5: d6e95de4cbbf43a7ad6a226fded0ce89
+      size: 235281
+    - path: src/train_model.py
+      hash: md5
+      md5: f2d7e9ee0e1cfed930070297aee0ab76
+      size: 4756
+    outs:
+    - path: models/best_model
+      hash: md5
+      md5: fac17e90fbb94a164fd7be0716108cb7.dir
+      size: 188825745
+      nfiles: 3
+    - path: models/final_model
+      hash: md5
+      md5: fac17e90fbb94a164fd7be0716108cb7.dir
+      size: 188825745
+      nfiles: 3
+  validate:
+    cmd: validate --config configs/train_config.yaml --model_path 
+      models/best_model
+    deps:
+    - path: configs/train_config.yaml
+      hash: md5
+      md5: 62769ead23a33f8c0fd3208825bf9835
+      size: 878
+    - path: models/best_model
+      hash: md5
+      md5: fac17e90fbb94a164fd7be0716108cb7.dir
+      size: 188825745
+      nfiles: 3
+    - path: src/validate_model.py
+      hash: md5
+      md5: 95e8358346ca4d2ffe66681926406b5a
+      size: 3425

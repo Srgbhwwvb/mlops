@@ -1,26 +1,27 @@
 stages:
   prepare:
-    cmd: python scripts/setup_data.py --config config/train_config.yaml
+    cmd: setup_data --config configs/train_config.yaml
     deps:
-      - scripts/setup_data.py
-      - config/train_config.yaml
+      - data/initial_data
+      - configs/train_config.yaml
+      - src/setup_data.py
     outs:
       - data/prepared_data
 
   train:
-    cmd: python scripts/train.py --config configs/train_config.yaml
+    cmd: train --config configs/train_config.yaml
     deps:
-      - scripts/train.py
-      - config/train_config.yaml
+      - data/prepared_data
+      - configs/train_config.yaml
+      - src/train_model.py
     outs:
       - models/best_model
-      - logs/training_log
+      - models/final_model
 
-  evaluate:
-    cmd: python scripts/validate.py --config config/train_config.yaml --model_path models/best_model
+  validate:
+    cmd: validate --config configs/train_config.yaml --model_path models/best_model
     deps:
-      - scripts/validate.py
       - models/best_model
-      - config/train_config.yaml
+      - configs/train_config.yaml
+      - src/validate_model.py
     outs: []
-    

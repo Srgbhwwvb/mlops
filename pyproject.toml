@@ -12,8 +12,10 @@ dependencies = [
     "tqdm==4.67.1",
     "PyYAML==6.0.3",
     "transformers==4.57.3",
+    "timm==1.0.22",
+    
     "dvc==3.65.0",
-    "timm==1.0.22"
+    "dvc_ssh==4.2.2"
 ]
 
 [project.optional-dependencies]
@@ -74,7 +76,8 @@ ignore = [
     "G004", "COM812", 
     "TRY003", "EM101", "EM102", "T201",
     "PTH207",
-    "D", "S"
+    "D", "S",
+    "FA100"
 ]
 
 [tool.mlflow]
