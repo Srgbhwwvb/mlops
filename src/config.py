@@ -78,7 +78,7 @@ class TrainingConfig:
         self.patience = int(config["patience"])
         self.optimizer = str(config["optimizer"])
         self.scheduler = str(config["scheduler"])
-        self.scheduler_config = (config["scheduler_config"],)
+        self.scheduler_config = config["scheduler_config"]
         self.seed = config.get("seed")
 
     def into_dict(self) -> dict[str, Any]:
