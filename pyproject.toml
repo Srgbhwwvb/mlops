@@ -33,6 +33,7 @@ test = [
     "taskipy==1.14.1"
 ]
 mlflow = [
+    "pathspec==0.11",
     "mlflow==3.8.1"
 ]
 api = [
