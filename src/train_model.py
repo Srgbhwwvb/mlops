@@ -136,6 +136,7 @@ def main():
 
     config = Config.from_file(args.config)
     log_dir = config.output_config.log_dir
+    log_dir.mkdir(parents=True, exist_ok=True)
 
     logging.basicConfig(
         level=logging.INFO,

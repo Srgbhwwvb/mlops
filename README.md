@@ -55,6 +55,8 @@ source .venv/bin/activate
 .venv\Scripts\activate
 
 pip install -e ".[dev, test, mlflow, api, torchserve]"
+dvc pull
+dvc repro
 ```
 Проект использует `pyproject.toml` для своего управления.
 
